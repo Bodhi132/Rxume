@@ -1,4 +1,5 @@
 import React from 'react'
+import Sidebar from '../components/Sidebar';
 
 const layout = ({
     children,
@@ -6,8 +7,8 @@ const layout = ({
     children: React.ReactNode;
 }>) => {
   return (
-    <div>
-        <h1>dashboard</h1>
+    <div className='flex bg-[#F5F5F5] w-screen h-screen'>
+        <Sidebar />
         {children}
     </div>
   )
