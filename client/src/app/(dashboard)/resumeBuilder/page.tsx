@@ -49,7 +49,7 @@ const App: React.FC = () => {
           description: [''],
           codeLink: '',
           demoLink: '',
-          techStack: [''],
+          techStack: [],
         },
       ],
       education: [{
@@ -57,6 +57,8 @@ const App: React.FC = () => {
         college: '',
         start: '',
         end: '',
+        grade: 0,
+        gradeType: '',
       }],
     }
   });
@@ -107,6 +109,7 @@ const App: React.FC = () => {
   });
 
   const [jobSkill, setjobSkill] = useState<string>('')
+  const [projectSkill, setProjectSkill] = useState<string>('')
 
   const handleSkillSelect = (skill: string, category: keyof typeof technicalSkills) => {
     setSelectedSkills((prevSelectedSkills) => ({
@@ -141,6 +144,11 @@ const App: React.FC = () => {
 
     setjobSkill('');
   };
+
+  const handleProjectSkill = (skill: string, index: number) => {
+    setValue(`projects.${index}.techStack`, [...watchedProjects[index].techStack, skill]);
+    setProjectSkill('');
+  }
 
   const skills = Object.values(technicalSkills).flat();
 
@@ -182,6 +190,8 @@ const App: React.FC = () => {
       college: string;
       start: string;
       end: string;
+      grade: number;
+      gradeType: string;
     }[];
   };
 
@@ -256,17 +266,17 @@ const App: React.FC = () => {
               {/* <input className='p-2 border border-gray-300 rounded' type="text" placeholder='Type the skills you used' onChange={(e) => setjobSkill(e.target.value)} /> */}
               <div>
                 <input type="text" className="p-2 border bg-transparent rounded" placeholder='Enter skills needed for the job' value={jobSkill} onChange={(e) => setjobSkill(e.target.value)} />
-                { 
+                {
                   watchedExperience[index]?.skill?.map((skill, i) => (
                     <button key={i} className='bg-gray-200 p-2 m-1 rounded'
-                      onClick={() =>{ setIsClicked(true); setValue(`experience.${index}.skill`, watchedExperience[index].skill.filter((s: string) => s !== skill))}}
+                      onClick={() => { setIsClicked(true); setValue(`experience.${index}.skill`, watchedExperience[index].skill.filter((s: string) => s !== skill)) }}
                     >{skill}</button>
                   ))
                 }
                 <div className='border border-gray-400 rounded p-2'>
                   <ul>
-                    {jobSkill && skills.filter((skill) => skill.toLowerCase().startsWith(jobSkill.toLowerCase())).map((skill, skillIndex) => (
-                      <li key={skillIndex} className='cursor-pointer p-2 hover:bg-gray-200' onClick={() => { setIsClicked(true); handleJobSkill(skill, index)}}>{skill}</li>
+                    {jobSkill && skills.filter((skill) => skill.toLowerCase().startsWith(jobSkill.toLowerCase()) && !watchedExperience[index]?.skill.includes(skill)).map((skill, skillIndex) => (
+                      <li key={skillIndex} className='cursor-pointer p-2 hover:bg-gray-200' onClick={() => { setIsClicked(true); handleJobSkill(skill, index) }}>{skill}</li>
                     ))}
                   </ul>
                 </div>
@@ -279,6 +289,8 @@ const App: React.FC = () => {
                     selected={value ? new Date(value) : null}
                     onChange={(date) => onChange(date?.toISOString() || null)}
                     placeholderText="Please Enter Start Date"
+                    showYearDropdown
+                    scrollableYearDropdown
                   />
                 )}
               />
@@ -294,6 +306,8 @@ const App: React.FC = () => {
                         ? new Date(watchedExperience[index]?.start)
                         : undefined
                     }
+                    showYearDropdown
+                    scrollableYearDropdown
                     placeholderText="Please Enter End Date"
                   />
                 )}
@@ -320,10 +334,10 @@ const App: React.FC = () => {
                   setValue(`experience.${index}.description`, [...descriptions, '']);
                 }}>Add Description</button>
               </div>
-              {index > 0 && <button type="button" onClick={() =>{ setIsClicked(true);removeExperience(index)}}>Remove Experience</button>}
+              {index > 0 && <button type="button" onClick={() => { setIsClicked(true); removeExperience(index) }}>Remove Experience</button>}
             </div>
           ))}
-          {<button type="button" onClick={() =>{ setIsClicked(true);appendExperience({ company: '', role: '', skill: [], start: '', end: '', description: [] })}}>Add Experience</button>}
+          {<button type="button" onClick={() => { setIsClicked(true); appendExperience({ company: '', role: '', skill: [], start: '', end: '', description: [] }) }}>Add Experience</button>}
         </div>
 
         <div>
@@ -354,43 +368,53 @@ const App: React.FC = () => {
                   className='p-2 border border-gray-300 rounded'
                 /> */}
 
-                <Controller 
-                  control={control}
-                  name={`projects.${projectIndex}.techStack`}
-                  render={({ field }) => (
-                    <>
-                      {
-                        field.value.map((_, techIndex) => (
-                          <div key={techIndex} className='flex gap-2 mt-2'>
-                            <input
-                              {...register(`projects.${projectIndex}.techStack.${techIndex}`)}
-                              placeholder='Please Enter the tech used'
-                              className='w-full p-2 border rounded'
-                            />
-                            <button
-                              type='button'
-                              className='bg-red-500 text-white p-2 rounded'
+                <div>
+                  <input
+                    type="text"
+                    className="p-2 border bg-transparent rounded"
+                    placeholder="Enter skills needed for the job"
+                    value={projectSkill}
+                    onChange={(e) => setProjectSkill(e.target.value)}
+                  />
+                  {watchedProjects[projectIndex]?.techStack?.map((skill, i) => (
+                    <button
+                      key={i}
+                      className="bg-gray-200 p-2 m-1 rounded"
+                      onClick={() => {
+                        setIsClicked(true);
+                        setValue(
+                          `projects.${projectIndex}.techStack`,
+                          watchedProjects[projectIndex].techStack.filter((s: string) => s !== skill)
+                        );
+                      }}
+                    >
+                      {skill}
+                    </button>
+                  ))}
+                  <div className="border border-gray-400 rounded p-2">
+                    <ul>
+                      {projectSkill &&
+                        skills
+                          .filter(
+                            (skill) =>
+                              skill.toLowerCase().startsWith(projectSkill.toLowerCase()) &&
+                              !watchedProjects[projectIndex]?.techStack.includes(skill)
+                          )
+                          .map((skill, skillIndex) => (
+                            <li
+                              key={skillIndex}
+                              className="cursor-pointer p-2 hover:bg-gray-200"
                               onClick={() => {
-                                const newTech = watchedProjects[projectIndex].techStack;
-                                newTech.splice(techIndex, 1);
-                                field.onChange(newTech);
+                                setIsClicked(true);
+                                handleProjectSkill(skill, projectIndex);
                               }}
                             >
-                              Remove
-                            </button>
-                          </div>
-                        ))
-                      }
-                      <button
-                        className='bg-blue-500 text-white p-2 rounded'
-                        onClick={() => field.onChange([...field.value, ''])}
-                      >
-                        Add Tech
-                      </button>
-                    </>
-                  )}
-                />
-
+                              {skill}
+                            </li>
+                          ))}
+                    </ul>
+                  </div>
+                </div>
                 <Controller
                   control={control}
                   name={`projects.${projectIndex}.description`}
@@ -428,8 +452,8 @@ const App: React.FC = () => {
                 />
                 <button
                   className='bg-red-500 text-white p-2 rounded'
-                  
-                  onClick={() => {setIsClicked(true); removeProject(projectIndex)}}
+
+                  onClick={() => { setIsClicked(true); removeProject(projectIndex) }}
                 >
                   Remove Project
                 </button>
@@ -438,7 +462,7 @@ const App: React.FC = () => {
           }
           <button
             className='bg-blue-500 text-white p-2 rounded'
-            onClick={() => {setIsClicked(true);appendProject({ name: '', description: [''], codeLink: '', demoLink: '', techStack: [''] })}}>
+            onClick={() => { setIsClicked(true); appendProject({ name: '', description: [''], codeLink: '', demoLink: '', techStack: [''] }) }}>
             Add Project
           </button>
         </div>
@@ -458,19 +482,83 @@ const App: React.FC = () => {
                   placeholder='Enter your college name'
                   className='p-2 border border-gray-300 rounded'
                 />
-                <input
+                {/* <input
                   {...register(`education.${educationIndex}.start`)}
                   placeholder='Enter start date'
                   className='p-2 border border-gray-300 rounded'
+                /> */}
+                <Controller
+                  control={control}
+                  name={`education.${educationIndex}.start`}
+                  render={({ field }) => (
+                    <DatePicker
+                      selected={field.value ? new Date(field.value) : null}
+                      onChange={(date) => field.onChange(date?.toISOString() || null)}
+                      placeholderText="Please Enter Start Date"
+                      showYearDropdown
+                      scrollableYearDropdown
+                    />
+                  )}
                 />
-                <input
+                {/* <input
                   {...register(`education.${educationIndex}.end`)}
                   placeholder='Enter end date'
                   className='p-2 border border-gray-300 rounded'
+                /> */}
+                <Controller
+                  control={control}
+                  name={`education.${educationIndex}.end`}
+                  render={({ field }) => (
+                    <DatePicker
+                      selected={field.value ? new Date(field.value) : null}
+                      onChange={(date) => field.onChange(date?.toISOString() || null)}
+                      placeholderText="Please Enter End Date"
+                      showYearDropdown
+                      scrollableYearDropdown
+                    />
+                  )}
                 />
+                {/* <input
+                    {...register(`education.${educationIndex}.gradeType`)}
+                    placeholder='Enter your grade type'
+                    className='p-2 border border-gray-300 rounded'
+                  /> */}
+                <Controller
+                  name={`education.${educationIndex}.gradeType`}
+                  control={control}
+                  render={({ field }) => (
+                    <select {...field} onMouseDown={() => setIsClicked(true)} onKeyDown={() => setIsClicked(true)} >
+                      <option value="">Select Grade Type</option>
+                      <option value="CGPA">CGPA</option>
+                      <option value="SGPA">SGPA</option>
+                      <option value="%">Percentage</option>
+                    </select>
+                  )}
+                />
+                {
+                  (watchedEducation[educationIndex].gradeType === 'CGPA' ||
+                    watchedEducation[educationIndex].gradeType === 'SGPA' ||
+                    watchedEducation[educationIndex].gradeType === '%') && (
+                    <Controller
+                      name={`education.${educationIndex}.grade`}
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          placeholder='Enter your grade'
+                          className='p-2 border border-gray-300 rounded'
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setIsClicked(true);
+                          }}
+                        />
+                      )}
+                    />
+                  )
+                }
                 <button
                   className='bg-red-500 text-white p-2 rounded'
-                  onClick={() => {setIsClicked(true);removeEducation(educationIndex)}}
+                  onClick={() => { setIsClicked(true); removeEducation(educationIndex) }}
                 >
                   Remove Education
                 </button>
@@ -479,7 +567,7 @@ const App: React.FC = () => {
           }
           <button
             className='bg-blue-500 text-white p-2 rounded'
-            onClick={() => {setIsClicked(true);appendEducation({ degree: '', college: '', start: '', end: '' })}}
+            onClick={() => { setIsClicked(true); appendEducation({ degree: '', college: '', start: '', end: '', grade: 0, gradeType: '' }) }}
           >
             Add Education
           </button>
@@ -492,7 +580,7 @@ const App: React.FC = () => {
         {
           // typeof window !== 'undefined' &&
           // <Suspense fallback={<div>Loading...</div>}>
-            <PdfViewer formData={formData} />
+          <PdfViewer formData={formData} />
           // </Suspense>
         }
       </div>}
