@@ -7,7 +7,7 @@ import { SiGoogleanalytics } from "react-icons/si";
 
 const Sidebar = () => {
     return (
-        <div className='lg:w-64 md:w-56 sm:w-48 w-40 h-full flex flex-col items-center bg-white rounded-r-3xl'>
+        <div className='lg:w-64 md:w-56 sm:w-48 w-40 h-screen flex flex-col items-center bg-white rounded-r-3xl sticky top-0'>
             <h1 className=' w-4/5 h-1/5 flex justify-center items-center'>
                 <Image src="/images/rxume-logo.png" alt="Logo" width={200} height={200} className=''/>
             </h1>
