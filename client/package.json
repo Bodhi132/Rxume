@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-icons/all-files": "^4.1.0",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf/renderer": "^4.2.1",
     "axios": "^1.7.9",

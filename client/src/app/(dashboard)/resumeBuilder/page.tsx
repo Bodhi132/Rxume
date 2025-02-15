@@ -4,6 +4,12 @@ import { useForm, SubmitHandler, useFieldArray, Controller, useWatch } from 'rea
 import { technicalSkills } from '@/data/skills';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import './styles.css';
+import { FaUser } from "react-icons/fa6";
+import { FaUniversity } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import { FaMinus } from "react-icons/fa";
 import dynamic from 'next/dynamic';
 
 const PdfViewer = dynamic(() => import('@/app/components/PdfViewer'), { ssr: false });
@@ -200,80 +206,104 @@ const App: React.FC = () => {
   const onSubmit: SubmitHandler<FormData> = (data) => console.log(data);
 
   return (
-    <div className="App p-4 flex gap-4 bg-gradient-to-t from-sky-500 to-indigo-500 h-full w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-1/2 bg-white h-screen rounded-md overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Personal Details</h2>
-        <input className="p-2 border border-gray-300 rounded" type="text" placeholder="Name" {...register('userInfo.name')} />
-        <input className="p-2 border border-gray-300 rounded" type="email" placeholder="Email" {...register('userInfo.email')} />
-        <input className="p-2 border border-gray-300 rounded" type="number" placeholder="Phone" {...register('userInfo.phone')} />
-        <input className="p-2 border border-gray-300 rounded" type="text" placeholder="Provide a link to your LinkedIn account" {...register('userInfo.linkedin')} />
-        <input className="p-2 border border-gray-300 rounded" type="text" placeholder="Provide a link to your GitHub account" {...register('userInfo.github')} />
-        <input className="p-2 border border-gray-300 rounded" type="text" placeholder="Provide a link to your Twitter account" {...register('userInfo.twitter')} />
-        <input className="p-2 border border-gray-300 rounded" type="text" placeholder="Provide a link to your Portfolio" {...register('userInfo.portfolio')} />
+    <div className="App p-4 flex gap-4 bg-[#6b5b95] h-screen w-full">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-1/2 bg-white h-[95vh] overflow-y-auto form-style rounded-md">
+        <h2 className='text-center font-semibold text-2xl pt-5'>RESUME DETAILS</h2>
+        <div className=' px-4'>
+          <hr className=' font-bold border-2 border-black' />
+        </div>
 
-        <h2 className="text-xl font-bold my-4">Technical Skills</h2>
-        <div>
-          {Object.keys(technicalSkills).map((category) => (
-            <div key={category} className="mb-4 flex flex-col">
-              <h3 className="text-lg font-semibold">{category.toUpperCase()}</h3>
-              <div className="flex flex-col border border-gray-400 p-2 rounded">
-                <div className='flex flex-wrap'>
-                  {watchedTechnicalSkills[category as keyof typeof technicalSkills].map((skill, index) => (
-                    <button
-                      key={index}
-                      className="m-1 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700"
-                      onClick={() => handleRemoveSkill(skill, category as keyof typeof technicalSkills)}
-                    >
-                      {skill} &times;
-                    </button>
-                  ))}
-                </div>
-                <div className="flex flex-col">
-                  <input
-                    type="text"
-                    className="border-none flex-1 outline-none bg-transparent block"
-                    placeholder="Type to search..."
-                    value={inputValues[category as keyof typeof technicalSkills]}
-                    onChange={(e) => handleInputChange(e, category as keyof typeof technicalSkills)}
-                  />
-                  <ul>
-                    {inputValues[category as keyof typeof technicalSkills] && technicalSkills[category as keyof typeof technicalSkills]
-                      .filter((skill) =>
-                        skill.toLowerCase().includes(inputValues[category as keyof typeof technicalSkills].toLowerCase()) &&
-                        !selectedSkills[category as keyof typeof technicalSkills].some(val => val.toLowerCase() === skill.toLowerCase())
-                      )
-                      .map((skill, index) => (
-                        <li
-                          key={index}
-                          className="cursor-pointer p-2 hover:bg-gray-200"
-                          onClick={() => handleSkillSelect(skill, category as keyof typeof technicalSkills)}
-                        >
-                          {skill}
-                        </li>
-                      ))}
-                  </ul>
+        <div className=' border-2 mx-3 py-5 border-black bg-[#EFF6FF] rounded-md'>
+          <div className='flex gap-2 px-4'>
+            <FaUser className="text-2xl text-center" />
+            <h2 className="text-xl font-bold mb-4">PERSONAL INFORMATION</h2>
+          </div>
+          <div className='grid grid-cols-2 gap-4 px-4'>
+            <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Name" {...register('userInfo.name')} />
+            <input className="p-2 border border-black rounded w-full personal-info-input" type="email" placeholder="Email" {...register('userInfo.email')} />
+            <input className="p-2 border border-black rounded w-full personal-info-input" type="number" placeholder="Phone" {...register('userInfo.phone')} />
+            <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Link to your LinkedIn account" {...register('userInfo.linkedin')} />
+            <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Link to your GitHub account" {...register('userInfo.github')} />
+            <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Link to your Twitter account" {...register('userInfo.twitter')} />
+            <input className="p-2 border border-black rounded w-full col-span-2 personal-info-input" type="text" placeholder="Link to your Portfolio" {...register('userInfo.portfolio')} />
+          </div>
+        </div>
+
+        <div className=' border-2 mx-3 py-5 border-black bg-[#ecfdf5] rounded-md'>
+          <div className='flex gap-2 px-4 my-4 items-center'>
+            <FaStar className="text-2xl text-center" />
+            <h2 className="text-xl font-bold">Technical Skills</h2>
+          </div>
+          <div>
+            {Object.keys(technicalSkills).map((category) => (
+              <div key={category} className="mb-4 flex flex-col px-4 gap-2 ">
+                <h3 className="text-lg font-semibold">{category.toUpperCase()}</h3>
+                <div className="flex flex-col border border-black p-2 rounded personal-info-input bg-white">
+                  <div className='flex flex-wrap gap-2'>
+                    {watchedTechnicalSkills[category as keyof typeof technicalSkills].map((skill, index) => (
+                      <button
+                        key={index}
+                        className="m-1 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 personal-info-input"
+                        onClick={() => handleRemoveSkill(skill, category as keyof typeof technicalSkills)}
+                      >
+                        {skill} &times;
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex flex-col ">
+                    <input
+                      type="text"
+                      className="border-none flex-1 outline-none bg-transparent block mx-3 my-2"
+                      placeholder="Type to search..."
+                      value={inputValues[category as keyof typeof technicalSkills]}
+                      onChange={(e) => handleInputChange(e, category as keyof typeof technicalSkills)}
+                    />
+                    <ul>
+                      {inputValues[category as keyof typeof technicalSkills] && technicalSkills[category as keyof typeof technicalSkills]
+                        .filter((skill) =>
+                          skill.toLowerCase().includes(inputValues[category as keyof typeof technicalSkills].toLowerCase()) &&
+                          !selectedSkills[category as keyof typeof technicalSkills].some(val => val.toLowerCase() === skill.toLowerCase())
+                        )
+                        .map((skill, index) => (
+                          <li
+                            key={index}
+                            className="cursor-pointer p-2 hover:bg-gray-200"
+                            onClick={() => handleSkillSelect(skill, category as keyof typeof technicalSkills)}
+                          >
+                            {skill}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-        <div>
-          <h2>Work Experience</h2>
+        <div className='border-2 mx-3 py-5 border-black bg-[#fef2f2] rounded-md'>
+          <div className='flex gap-2 px-4 my-4 items-center'>
+            <FaUniversity className="text-2xl text-center" />
+            <h2 className='text-xl font-bold'>Work Experience</h2>
+          </div>
           {experienceFields.map((field, index) => (
-            <div key={field.id} className="mb-4">
-              <input className="p-2 border border-gray-300 rounded" type="text" placeholder="Type company name" {...register(`experience.${index}.company`)} />
-              <input className='p-2 border border-gray-300 rounded' type="text" placeholder='Type your role in the company' {...register(`experience.${index}.role`)} />
+            <div key={field.id} className="mb-4 flex flex-col px-4 gap-2 ">
+              <div className='flex gap-4'>
+                <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Type company name" {...register(`experience.${index}.company`)} />
+                <input className='p-2 border border-black rounded w-full personal-info-input' type="text" placeholder='Type your role in the company' {...register(`experience.${index}.role`)} />
+              </div>
               {/* <input className='p-2 border border-gray-300 rounded' type="text" placeholder='Type the skills you used' onChange={(e) => setjobSkill(e.target.value)} /> */}
-              <div>
-                <input type="text" className="p-2 border bg-transparent rounded" placeholder='Enter skills needed for the job' value={jobSkill} onChange={(e) => setjobSkill(e.target.value)} />
-                {
-                  watchedExperience[index]?.skill?.map((skill, i) => (
-                    <button key={i} className='bg-gray-200 p-2 m-1 rounded'
-                      onClick={() => { setIsClicked(true); setValue(`experience.${index}.skill`, watchedExperience[index].skill.filter((s: string) => s !== skill)) }}
-                    >{skill}</button>
-                  ))
-                }
-                <div className='border border-gray-400 rounded p-2'>
+              <div className=' my-3'>
+                <div className='border border-black bg-white personal-info-input rounded p-2 flex flex-col'>
+                  <input type="text" className="p-2 bg-transparent rounded" placeholder='Enter skills needed for the job' value={jobSkill} onChange={(e) => setjobSkill(e.target.value)} />
+                  <div className='flex flex-wrap gap-2'>
+                    {
+                      watchedExperience[index]?.skill?.map((skill, i) => (
+                        <button key={i} className='m-1 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 personal-info-input'
+                          onClick={() => { setIsClicked(true); setValue(`experience.${index}.skill`, watchedExperience[index].skill.filter((s: string) => s !== skill)) }}
+                        >{skill} &times;</button>
+                      ))
+                    }
+                  </div>
                   <ul>
                     {jobSkill && skills.filter((skill) => skill.toLowerCase().startsWith(jobSkill.toLowerCase()) && !watchedExperience[index]?.skill.includes(skill)).map((skill, skillIndex) => (
                       <li key={skillIndex} className='cursor-pointer p-2 hover:bg-gray-200' onClick={() => { setIsClicked(true); handleJobSkill(skill, index) }}>{skill}</li>
@@ -281,43 +311,44 @@ const App: React.FC = () => {
                   </ul>
                 </div>
               </div>
-              <Controller
-                name={`experience.${index}.start`}
-                control={control}
-                render={({ field: { onChange, onBlur, value, ref } }) => (
-                  <DatePicker
-                    selected={value ? new Date(value) : null}
-                    onChange={(date) => onChange(date?.toISOString() || null)}
-                    placeholderText="Please Enter Start Date"
-                    showYearDropdown
-                    scrollableYearDropdown
-                  />
-                )}
-              />
-              <Controller
-                name={`experience.${index}.end`}
-                control={control}
-                render={({ field: { onChange, onBlur, value, ref } }) => (
-                  <DatePicker
-                    selected={value ? new Date(value) : null}
-                    onChange={(date) => onChange(date?.toISOString() || null)}
-                    minDate={
-                      watchedExperience[index]?.start
-                        ? new Date(watchedExperience[index]?.start)
-                        : undefined
-                    }
-                    showYearDropdown
-                    scrollableYearDropdown
-                    placeholderText="Please Enter End Date"
-                  />
-                )}
-              />
-              <div>
-                <h3>Description</h3>
+              <div className='flex gap-4 w-full'>
+                <Controller
+                  name={`experience.${index}.start`}
+                  control={control}
+                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                    <DatePicker
+                      selected={value ? new Date(value) : null}
+                      onChange={(date) => onChange(date?.toISOString() || null)}
+                      placeholderText="Please Enter Start Date"
+                      showYearDropdown
+                      scrollableYearDropdown
+                      yearDropdownItemNumber={50}
+                      className='p-2 border border-black rounded w-full personal-info-input'
+                    />
+                  )}
+                />
+                <Controller
+                  name={`experience.${index}.end`}
+                  control={control}
+                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                    <DatePicker
+                      selected={value ? new Date(value) : null}
+                      onChange={(date) => onChange(date?.toISOString() || null)}
+                      yearDropdownItemNumber={50}
+                      showYearDropdown
+                      scrollableYearDropdown
+                      placeholderText="Please Enter End Date"
+                      className='p-2 border border-black rounded w-full personal-info-input'
+                    />
+                  )}
+                />
+              </div>
+              <div className='my-3 flex flex-col gap-3'>
+                <h3 className='text-xl font-bold'>Description</h3>
                 {watchedExperience[index]?.description.map((desc, descInd) => (
-                  <div key={descInd} className='mb-2'>
+                  <div key={descInd}>
                     <input
-                      className="p-2 border border-gray-300 rounded"
+                      className="p-2 border border-black rounded w-full personal-info-input"
                       type="text"
                       placeholder="Description"
                       {...register(`experience.${index}.description.${descInd}`, { required: descInd < 3 })}
@@ -329,15 +360,24 @@ const App: React.FC = () => {
                     }}>Remove</button>}
                   </div>
                 ))}
-                <button type="button" onClick={() => {
+                <button type="button" className='flex items-center justify-center text-xs bg-[#f7cac9] p-3 w-fit gap-2 rounded-md personal-info-input mt-4' onClick={() => {
                   const descriptions = watchedExperience[index].description;
                   setValue(`experience.${index}.description`, [...descriptions, '']);
-                }}>Add Description</button>
+                }}>
+                  <FaPlus className='text-xs block' />
+                  <p className='text-xs font-bold h-5'>Add Description</p>
+                </button>
               </div>
-              {index > 0 && <button type="button" onClick={() => { setIsClicked(true); removeExperience(index) }}>Remove Experience</button>}
+              {index > 0 && <button type="button" className='flex items-center justify-center text-xs font-bold bg-[#f7cac9] p-3 w-fit gap-2 rounded-md personal-info-input mt-2' onClick={() => { setIsClicked(true); removeExperience(index) }}>
+                <FaMinus />
+                <p>Remove Experience</p>
+              </button>}
             </div>
           ))}
-          {<button type="button" onClick={() => { setIsClicked(true); appendExperience({ company: '', role: '', skill: [], start: '', end: '', description: [] }) }}>Add Experience</button>}
+          {<button type="button" className='flex items-center justify-center text-xs font-bold bg-[#f7cac9] p-3 w-fit gap-2 rounded-md personal-info-input mt-2 ml-5' onClick={() => { setIsClicked(true); appendExperience({ company: '', role: '', skill: [], start: '', end: '', description: [] }) }}>
+            <FaPlus />
+            <p>Add Experience</p>
+          </button>}
         </div>
 
         <div>
@@ -576,7 +616,7 @@ const App: React.FC = () => {
         </div>
         <input type="submit" />
       </form>
-      {!isClicked && <div className=' w-1/2'>
+      {!isClicked && <div className=' w-1/2 h-[95vh]'>
         {
           // typeof window !== 'undefined' &&
           // <Suspense fallback={<div>Loading...</div>}>

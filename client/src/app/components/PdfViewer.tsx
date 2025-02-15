@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
 // PDF Document Component
 const PdfViewer = ({ formData }: { formData: any }) => (
     
-    <PDFViewer width="100%" height="100%">
+    <PDFViewer width="100%" height="100%" >
         <Document>
             <Page size="A4" style={{flexDirection: "column", padding: 20,fontFamily:'Calibri', fontWeight:'bold'}}>
                 <View style={{ flexDirection: "row", justifyContent: "center", gap: 10 }}>

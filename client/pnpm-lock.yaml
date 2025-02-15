@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@react-icons/all-files':
+        specifier: ^4.1.0
+        version: 4.1.0(react@19.0.0)
       '@react-pdf-viewer/core':
         specifier: ^3.12.0
         version: 3.12.0(pdfjs-dist@4.10.38)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -437,6 +440,11 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
+
+  '@react-icons/all-files@4.1.0':
+    resolution: {integrity: sha512-hxBI2UOuVaI3O/BhQfhtb4kcGn9ft12RWAFVMUeNjqqhLsHvFtzIkFaptBJpFDANTKoDfdVoHTKZDlwKCACbMQ==}
+    peerDependencies:
+      react: '*'
 
   '@react-pdf-viewer/core@3.12.0':
     resolution: {integrity: sha512-8MsdlQJ4jaw3GT+zpCHS33nwnvzpY0ED6DEahZg9WngG++A5RMhk8LSlxdHelwaFFHFiXBjmOaj2Kpxh50VQRg==}
@@ -2405,6 +2413,10 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@react-icons/all-files@4.1.0(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
 
   '@react-pdf-viewer/core@3.12.0(pdfjs-dist@4.10.38)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
