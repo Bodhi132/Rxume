@@ -10,6 +10,8 @@ import { FaUniversity } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
+import { IoCodeSlash } from "react-icons/io5";
+import { BiBriefcase, BiSolidBriefcase } from "react-icons/bi";
 import dynamic from 'next/dynamic';
 
 const PdfViewer = dynamic(() => import('@/app/components/PdfViewer'), { ssr: false });
@@ -52,7 +54,7 @@ const App: React.FC = () => {
       projects: [
         {
           name: '',
-          description: [''],
+          description: ['', '', ''],
           codeLink: '',
           demoLink: '',
           techStack: [],
@@ -207,7 +209,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App p-4 flex gap-4 bg-[#6b5b95] h-screen w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-1/2 bg-white h-[95vh] overflow-y-auto form-style rounded-md">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-1/2 bg-[#EFF3EA] border-black border-2 h-[95vh] overflow-y-auto form-style rounded-md">
         <h2 className='text-center font-semibold text-2xl pt-5'>RESUME DETAILS</h2>
         <div className=' px-4'>
           <hr className=' font-bold border-2 border-black' />
@@ -283,7 +285,7 @@ const App: React.FC = () => {
         <div className='border-2 mx-3 py-5 border-black bg-[#fef2f2] rounded-md'>
           <div className='flex gap-2 px-4 my-4 items-center'>
             <FaUniversity className="text-2xl text-center" />
-            <h2 className='text-xl font-bold'>Work Experience</h2>
+            <h2 className='text-xl font-bold'>WORK EXPERIENCE</h2>
           </div>
           {experienceFields.map((field, index) => (
             <div key={field.id} className="mb-4 flex flex-col px-4 gap-2 ">
@@ -346,18 +348,21 @@ const App: React.FC = () => {
               <div className='my-3 flex flex-col gap-3'>
                 <h3 className='text-xl font-bold'>Description</h3>
                 {watchedExperience[index]?.description.map((desc, descInd) => (
-                  <div key={descInd}>
+                  <div key={descInd} className='flex gap-3 items-center'>
                     <input
-                      className="p-2 border border-black rounded w-full personal-info-input"
+                      className="p-2 border border-black rounded w-full personal-info-input text-wrap"
                       type="text"
                       placeholder="Description"
                       {...register(`experience.${index}.description.${descInd}`, { required: descInd < 3 })}
                     />
-                    {descInd > 2 && typeof window !== 'undefined' && <button type="button" onClick={() => {
-                      const descriptions = watchedExperience[index].description;
-                      setIsClicked(true);
-                      setValue(`experience.${index}.description`, descriptions.filter((_, i) => i !== descInd));
-                    }}>Remove</button>}
+                    {descInd > 2 && typeof window !== 'undefined' &&
+                      <button type="button" className='bg-[#D91656] hover:bg-[#6f253e] text-xs personal-info-input' onClick={() => {
+                        const descriptions = watchedExperience[index].description;
+                        setIsClicked(true);
+                        setValue(`experience.${index}.description`, descriptions.filter((_, i) => i !== descInd));
+                      }}>
+                        <p className=' font-bold'>Remove Description</p>
+                      </button>}
                   </div>
                 ))}
                 <button type="button" className='flex items-center justify-center text-xs bg-[#f7cac9] p-3 w-fit gap-2 rounded-md personal-info-input mt-4' onClick={() => {
@@ -374,33 +379,39 @@ const App: React.FC = () => {
               </button>}
             </div>
           ))}
-          {<button type="button" className='flex items-center justify-center text-xs font-bold bg-[#f7cac9] p-3 w-fit gap-2 rounded-md personal-info-input mt-2 ml-5' onClick={() => { setIsClicked(true); appendExperience({ company: '', role: '', skill: [], start: '', end: '', description: [] }) }}>
+          {<button type="button" className='flex items-center justify-center text-xs font-bold bg-[#f7cac9] p-3 w-fit gap-2 rounded-md personal-info-input mt-2 ml-5' onClick={() => { setIsClicked(true); appendExperience({ company: '', role: '', skill: [], start: '', end: '', description: ['', '', ''] }) }}>
             <FaPlus />
             <p>Add Experience</p>
           </button>}
         </div>
 
-        <div>
-          <h2>Project Title</h2>
+        <div className='border-2 mx-3 py-5 border-black bg-[#F8F5E9] rounded-md'>
+          <div className='flex gap-2 px-4 my-4 items-center '>
+            <IoCodeSlash className="text-2xl text-center" />
+            <h2 className="text-xl font-bold ">PROJECT TITLE</h2>
+          </div>
           {
             watchedProjects.map((_, projectIndex) => (
-              <div key={projectIndex}>
+              <div key={projectIndex} className='mb-4 flex flex-col px-4 gap-4 '>
 
                 <input {...register(`projects.${projectIndex}.name`)}
                   placeholder='Project Name'
-                  className='p-2 border border-gray-300 rounded'
+                  className='p-2 border border-black rounded w-full personal-info-input'
                 />
 
-                <input {...register(`projects.${projectIndex}.codeLink`)}
-                  placeholder='Enter Github ,gitlab or bitbucket link'
-                  className='p-2 border border-gray-300 rounded'
-                />
+                <div className='flex gap-4'>
+                  <input {...register(`projects.${projectIndex}.codeLink`)}
+                    placeholder='Enter Github ,gitlab or bitbucket link'
+                    className='p-2 border border-black rounded w-full personal-info-input'
+                  />
 
-                <input
-                  {...register(`projects.${projectIndex}.demoLink`)}
-                  placeholder='Enter the deployed link or the video link'
-                  className='p-2 border border-gray-300 rounded'
-                />
+                  <input
+                    {...register(`projects.${projectIndex}.demoLink`)}
+                    placeholder='Enter the deployed link or the video link'
+                    className='p-2 border border-black rounded w-full personal-info-input'
+                  />
+                </div>
+
 
                 {/* <input
                   {...register(`projects.${projectIndex}.techStack`)}
@@ -408,7 +419,7 @@ const App: React.FC = () => {
                   className='p-2 border border-gray-300 rounded'
                 /> */}
 
-                <div>
+                <div className='border border-black bg-white personal-info-input rounded p-2 flex flex-col'>
                   <input
                     type="text"
                     className="p-2 border bg-transparent rounded"
@@ -416,44 +427,45 @@ const App: React.FC = () => {
                     value={projectSkill}
                     onChange={(e) => setProjectSkill(e.target.value)}
                   />
-                  {watchedProjects[projectIndex]?.techStack?.map((skill, i) => (
-                    <button
-                      key={i}
-                      className="bg-gray-200 p-2 m-1 rounded"
-                      onClick={() => {
-                        setIsClicked(true);
-                        setValue(
-                          `projects.${projectIndex}.techStack`,
-                          watchedProjects[projectIndex].techStack.filter((s: string) => s !== skill)
-                        );
-                      }}
-                    >
-                      {skill}
-                    </button>
-                  ))}
-                  <div className="border border-gray-400 rounded p-2">
-                    <ul>
-                      {projectSkill &&
-                        skills
-                          .filter(
-                            (skill) =>
-                              skill.toLowerCase().startsWith(projectSkill.toLowerCase()) &&
-                              !watchedProjects[projectIndex]?.techStack.includes(skill)
-                          )
-                          .map((skill, skillIndex) => (
-                            <li
-                              key={skillIndex}
-                              className="cursor-pointer p-2 hover:bg-gray-200"
-                              onClick={() => {
-                                setIsClicked(true);
-                                handleProjectSkill(skill, projectIndex);
-                              }}
-                            >
-                              {skill}
-                            </li>
-                          ))}
-                    </ul>
+                  <div className='flex flex-wrap gap-2'>
+                    {watchedProjects[projectIndex]?.techStack?.map((skill, i) => (
+                      <button
+                        key={i}
+                        className='m-1 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 personal-info-input'
+                        onClick={() => {
+                          setIsClicked(true);
+                          setValue(
+                            `projects.${projectIndex}.techStack`,
+                            watchedProjects[projectIndex].techStack.filter((s: string) => s !== skill)
+                          );
+                        }}
+                      >
+                        {skill}
+                      </button>
+                    ))}
                   </div>
+                  <ul>
+                    {projectSkill &&
+                      skills
+                        .filter(
+                          (skill) =>
+                            skill.toLowerCase().startsWith(projectSkill.toLowerCase()) &&
+                            !watchedProjects[projectIndex]?.techStack.includes(skill)
+                        )
+                        .map((skill, skillIndex) => (
+                          <li
+                            key={skillIndex}
+                            className="cursor-pointer p-2 hover:bg-gray-200"
+                            onClick={() => {
+                              setIsClicked(true);
+                              handleProjectSkill(skill, projectIndex);
+                            }}
+                          >
+                            {skill}
+                          </li>
+                        ))}
+                  </ul>
+
                 </div>
                 <Controller
                   control={control}
@@ -462,27 +474,28 @@ const App: React.FC = () => {
                     <>
                       {
                         field.value.map((_, descIndex) => (
-                          <div key={descIndex} className='flex gap-2 mt-2'>
+                          <div key={descIndex} className='flex gap-4 mt-2'>
                             <input
                               {...register(`projects.${projectIndex}.description.${descIndex}`)}
                               placeholder='Please Enter details of your project'
-                              className='w-full p-2 border rounded'
+                              className='w-full p-2 border border-black rounded personal-info-input'
                             />
-                            <button
+                            {descIndex > 2 && <button
                               type='button'
-                              className='bg-red-500 text-white p-2 rounded'
+                              className='bg-red-500 text-white p-1 rounded personal-info-input'
                               onClick={() => {
+                                setIsClicked(true)
                                 const newDesc = watchedProjects[projectIndex].description;
                                 newDesc.splice(descIndex, 1);
                                 field.onChange(newDesc);
                               }}
                             >
                               Remove
-                            </button>
+                            </button>}
                           </div>
                         ))}
                       <button
-                        className='bg-blue-500 text-white p-2 rounded'
+                        className='bg-[#FFF2C2] personal-info-input text-black font-bold p-2 rounded'
                         onClick={() => field.onChange([...field.value, ''])}
                       >
                         Add Description
@@ -490,37 +503,41 @@ const App: React.FC = () => {
                     </>
                   )}
                 />
-                <button
-                  className='bg-red-500 text-white p-2 rounded'
-
+                {<button
+                  className='bg-red-500 text-white personal-info-input font-bold p-2 rounded'
+                  type='button'
                   onClick={() => { setIsClicked(true); removeProject(projectIndex) }}
                 >
                   Remove Project
-                </button>
+                </button>}
               </div>
             ))
           }
           <button
-            className='bg-blue-500 text-white p-2 rounded'
+            className='bg-[#FFF2C2] personal-info-input text-black font-bold p-2 ml-4 rounded flex items-center gap-2'
             onClick={() => { setIsClicked(true); appendProject({ name: '', description: [''], codeLink: '', demoLink: '', techStack: [''] }) }}>
-            Add Project
+            <FaPlus />
+            <p>Add Project</p>
           </button>
         </div>
 
-        <div>
-          <h2>Education Details</h2>
+        <div className='border-2 mx-3 py-5 border-black bg-[#fff4ef] rounded-md flex flex-col gap-3'>
+          <div className='flex gap-2 px-4 my-4 items-center'>
+            <BiSolidBriefcase />
+            <h2>Education Details</h2>
+          </div>
           {
             watchedEducation.map((_, educationIndex) => (
-              <div key={educationIndex}>
+              <div key={educationIndex} className=' grid grid-cols-2 gap-4 px-4'>
                 <input
                   {...register(`education.${educationIndex}.degree`)}
                   placeholder='Enter your degree'
-                  className='p-2 border border-gray-300 rounded'
+                  className='p-2 border border-black rounded w-full personal-info-input'
                 />
                 <input
                   {...register(`education.${educationIndex}.college`)}
                   placeholder='Enter your college name'
-                  className='p-2 border border-gray-300 rounded'
+                  className='p-2 border border-black rounded w-full personal-info-input'
                 />
                 {/* <input
                   {...register(`education.${educationIndex}.start`)}
@@ -532,6 +549,7 @@ const App: React.FC = () => {
                   name={`education.${educationIndex}.start`}
                   render={({ field }) => (
                     <DatePicker
+                      className='p-2 border border-black rounded w-full personal-info-input'
                       selected={field.value ? new Date(field.value) : null}
                       onChange={(date) => field.onChange(date?.toISOString() || null)}
                       placeholderText="Please Enter Start Date"
@@ -550,6 +568,7 @@ const App: React.FC = () => {
                   name={`education.${educationIndex}.end`}
                   render={({ field }) => (
                     <DatePicker
+                      className='p-2 border border-black rounded w-full personal-info-input'
                       selected={field.value ? new Date(field.value) : null}
                       onChange={(date) => field.onChange(date?.toISOString() || null)}
                       placeholderText="Please Enter End Date"
@@ -567,7 +586,9 @@ const App: React.FC = () => {
                   name={`education.${educationIndex}.gradeType`}
                   control={control}
                   render={({ field }) => (
-                    <select {...field} onMouseDown={() => setIsClicked(true)} onKeyDown={() => setIsClicked(true)} >
+                    <select {...field} onMouseDown={() => setIsClicked(true)} onKeyDown={() => setIsClicked(true)}
+                      className='p-2 border border-black rounded w-full personal-info-input'
+                    >
                       <option value="">Select Grade Type</option>
                       <option value="CGPA">CGPA</option>
                       <option value="SGPA">SGPA</option>
@@ -585,8 +606,8 @@ const App: React.FC = () => {
                       render={({ field }) => (
                         <input
                           {...field}
+                          className='p-2 border border-black rounded w-full personal-info-input'
                           placeholder='Enter your grade'
-                          className='p-2 border border-gray-300 rounded'
                           onChange={(e) => {
                             field.onChange(e.target.value);
                             setIsClicked(true);
@@ -597,7 +618,7 @@ const App: React.FC = () => {
                   )
                 }
                 <button
-                  className='bg-red-500 text-white p-2 rounded'
+                  className='bg-red-500 text-white personal-info-input font-bold p-2 rounded col-span-2'
                   onClick={() => { setIsClicked(true); removeEducation(educationIndex) }}
                 >
                   Remove Education
@@ -606,7 +627,7 @@ const App: React.FC = () => {
             ))
           }
           <button
-            className='bg-blue-500 text-white p-2 rounded'
+            className='bg-[#fee68e] w-fit text-white personal-info-input font-bold p-2 rounded col-span-2 ml-4'
             onClick={() => { setIsClicked(true); appendEducation({ degree: '', college: '', start: '', end: '', grade: 0, gradeType: '' }) }}
           >
             Add Education

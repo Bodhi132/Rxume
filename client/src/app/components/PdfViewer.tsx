@@ -119,7 +119,7 @@ const PdfViewer = ({ formData }: { formData: any }) => (
                                 </Link>
                                 <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     {
-                                        project.techStack.length > 0 && project?.techStack?.map((tech: string, index: number) => (
+                                        project?.techStack?.length > 0 && project?.techStack?.map((tech: string, index: number) => (
                                             <Text key={index}>{tech}</Text>
                                         ))
                                     }
