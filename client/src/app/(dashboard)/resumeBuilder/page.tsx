@@ -209,7 +209,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App p-4 flex gap-4 bg-[#6b5b95] h-screen w-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-1/2 bg-[#EFF3EA] border-black border-2 h-[95vh] overflow-y-auto form-style rounded-md">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-1/2 bg-[#EFF3EA] border-black border-2 h-[95vh] overflow-y-auto form-style rounded-md ">
         <h2 className='text-center font-semibold text-2xl pt-5'>RESUME DETAILS</h2>
         <div className=' px-4'>
           <hr className=' font-bold border-2 border-black' />
@@ -527,7 +527,7 @@ const App: React.FC = () => {
             <h2>Education Details</h2>
           </div>
           {
-            watchedEducation.map((_, educationIndex) => (
+            educationFields.map((_, educationIndex) => (
               <div key={educationIndex} className=' grid grid-cols-2 gap-4 px-4'>
                 <input
                   {...register(`education.${educationIndex}.degree`)}
@@ -597,9 +597,9 @@ const App: React.FC = () => {
                   )}
                 />
                 {
-                  (watchedEducation[educationIndex].gradeType === 'CGPA' ||
-                    watchedEducation[educationIndex].gradeType === 'SGPA' ||
-                    watchedEducation[educationIndex].gradeType === '%') && (
+                  (educationFields[educationIndex].gradeType === 'CGPA' ||
+                    educationFields[educationIndex].gradeType === 'SGPA' ||
+                    educationFields[educationIndex].gradeType === '%') && (
                     <Controller
                       name={`education.${educationIndex}.grade`}
                       control={control}
@@ -619,7 +619,11 @@ const App: React.FC = () => {
                 }
                 <button
                   className='bg-red-500 text-white personal-info-input font-bold p-2 rounded col-span-2'
-                  onClick={() => { setIsClicked(true); removeEducation(educationIndex) }}
+                  onClick={() => {
+                    console.log('Removing project at index:', educationIndex);
+                    setIsClicked(true);
+                    removeEducation(educationIndex)
+                  }}
                 >
                   Remove Education
                 </button>
@@ -627,15 +631,18 @@ const App: React.FC = () => {
             ))
           }
           <button
-            className='bg-[#fee68e] w-fit text-white personal-info-input font-bold p-2 rounded col-span-2 ml-4'
+            className='bg-[#fee68e] w-fit text-black personal-info-input font-bold p-2 rounded col-span-2 ml-4 flex items-center gap-2'
             onClick={() => { setIsClicked(true); appendEducation({ degree: '', college: '', start: '', end: '', grade: 0, gradeType: '' }) }}
           >
-            Add Education
+            <FaPlus />
+            <p>Add Education</p>
           </button>
         </div>
         <div>
         </div>
-        <input type="submit" />
+        <div className=' border-2 mx-3 py-2 mb-4 border-black bg-[#EFF6FF] rounded-md personal-info-input'>
+          <input type="submit" className='w-full cursor-pointer' />
+        </div>
       </form>
       {!isClicked && <div className=' w-1/2 h-[95vh]'>
         {
