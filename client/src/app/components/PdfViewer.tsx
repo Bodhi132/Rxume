@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import { PDFViewer, Font } from '@react-pdf/renderer';
-import { Page, Text, View, Document, StyleSheet, Link, Svg, Path } from "@react-pdf/renderer";
+import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, } from "@react-pdf/renderer";
+
 import { GoDotFill } from "react-icons/go";
 
 Font.register({
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
 // PDF Document Component
 const PdfViewer = ({ formData }: { formData: any }) => (
 
-    <PDFViewer width="100%" height="100%" >
+    <PDFViewer width="100%" height="100%" showToolbar={false} >
         <Document>
             <Page size="A4" style={{ flexDirection: "column", padding: 20 }}>
                 <View style={{ flexDirection: "row", justifyContent: "center", gap: 10 }}>
@@ -93,7 +94,7 @@ const PdfViewer = ({ formData }: { formData: any }) => (
                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '20px', marginTop: '20px', marginLeft: '15px' }}>EXPERIENCE :</Text>
                     {
                         formData?.experience?.map((experience: any, index: number) => (
-                            <View key={index} style={{ marginBottom: '10px', marginLeft: '15px' }}>
+                            <View key={index} style={{ marginBottom: '10px', marginLeft: '15px', fontWeight:'semibold' }}>
                                 <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '13px', marginTop: '15px' }}>
                                     <Text>{experience?.role || ""}</Text>
                                     <Text>-</Text>
@@ -109,23 +110,28 @@ const PdfViewer = ({ formData }: { formData: any }) => (
                                         </View>
                                     </View>
                                 </View>
+                                <View style={{ display: 'flex', flexDirection: 'row', gap: '1px', flexWrap: 'wrap', marginTop: '4px' }}>
+                                    <Text style={{ fontSize: '12px' }}>{'('}</Text>
+                                    {
+                                        experience?.skill?.length > 0 && experience?.skill?.map((tech: string, index: number) => (
+                                            <>
+                                                <Text key={index} style={{ fontSize: '12px' }}>{tech}</Text>
+                                                <Text style={{ fontSize: '12px' }}>{index === experience.skill?.length - 1 ? "" : ","}</Text>
+                                            </>
+                                        ))
+                                    }
+                                    <Text style={{ fontSize: '12px' }}>{')'}</Text>
+                                </View>
                                 <View style={{ marginVertical: '15px', fontWeight: 'medium' }}>
                                     {
                                         experience?.description.map((description: string, index: number) =>
-                                            <View style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '15px', marginVertical: '1px', paddingHorizontal: '15px' }}>
+                                            <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '15px', marginVertical: '1px', paddingHorizontal: '15px' }}>
                                                 <Text style={{ fontWeight: 'bold', fontSize: '20px' }}>{'\u2022'}</Text>
                                                 <Text key={index}>{description}</Text>
                                             </View>
                                         )
                                     }
                                 </View>
-                                {
-                                    experience.skill.length > 0 && experience?.skill.map((skill: string, index: number) => (
-                                        <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }} key={index}>
-                                            <Text key={index}>{skill}</Text>
-                                        </View>
-                                    ))
-                                }
                             </View>
                         ))
                     }
@@ -162,7 +168,7 @@ const PdfViewer = ({ formData }: { formData: any }) => (
                         formData?.projects?.map((project: any, index: number) => (
                             <View key={index} style={styles.section}>
                                 <View style={{ marginBottom: '10px', marginLeft: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '13px',width:'50%' }}>
+                                    <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '13px', width: '50%' }}>
                                         <Text>{project?.name || ""}</Text>
                                         <Link src={project?.codeLink || ""}>
                                             <Text>Code</Text>
@@ -171,7 +177,7 @@ const PdfViewer = ({ formData }: { formData: any }) => (
                                             <Text>Demo</Text>
                                         </Link>
                                     </View>
-                                    <View style={{ display: 'flex', flexDirection: 'row', gap: '5px',fontSize: '13px',width:'50%' }}>
+                                    <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '13px', width: '50%' }}>
                                         {/* <Text>{project?.description || ""}</Text> */}
                                         <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', flexWrap: 'wrap' }}>
                                             {
