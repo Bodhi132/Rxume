@@ -284,14 +284,14 @@ const App: React.FC = () => {
         </div>
         <div className='border-2 mx-3 py-5 border-black bg-[#fef2f2] rounded-md'>
           <div className='flex gap-2 px-4 my-4 items-center'>
-            <FaUniversity className="text-2xl text-center" />
+            <BiSolidBriefcase className="text-2xl text-center" />
             <h2 className='text-xl font-bold'>WORK EXPERIENCE</h2>
           </div>
           {experienceFields.map((field, index) => (
             <div key={field.id} className="mb-4 flex flex-col px-4 gap-2 ">
               <div className='flex gap-4'>
-                <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Type company name" {...register(`experience.${index}.company`)} />
                 <input className='p-2 border border-black rounded w-full personal-info-input' type="text" placeholder='Type your role in the company' {...register(`experience.${index}.role`)} />
+                <input className="p-2 border border-black rounded w-full personal-info-input" type="text" placeholder="Type company name" {...register(`experience.${index}.company`)} />
               </div>
               {/* <input className='p-2 border border-gray-300 rounded' type="text" placeholder='Type the skills you used' onChange={(e) => setjobSkill(e.target.value)} /> */}
               <div className=' my-3'>
@@ -383,6 +383,124 @@ const App: React.FC = () => {
             <FaPlus />
             <p>Add Experience</p>
           </button>}
+        </div>
+
+        <div className='border-2 mx-3 py-5 border-black bg-[#fff4ef] rounded-md flex flex-col gap-3'>
+          <div className='flex gap-2 px-4 my-4 items-center'>
+            <FaUniversity className="text-2xl text-center" />
+            <h2 className='text-xl font-bold'>Education Details</h2>
+          </div>
+          {
+            educationFields.map((_, educationIndex) => (
+              <div key={educationIndex} className=' grid grid-cols-2 gap-4 px-4'>
+                <input
+                  {...register(`education.${educationIndex}.college`)}
+                  placeholder='Enter your college name'
+                  className='p-2 border border-black rounded w-full personal-info-input'
+                />
+                <input
+                  {...register(`education.${educationIndex}.degree`)}
+                  placeholder='Enter your degree'
+                  className='p-2 border border-black rounded w-full personal-info-input'
+                />
+                {/* <input
+                  {...register(`education.${educationIndex}.start`)}
+                  placeholder='Enter start date'
+                  className='p-2 border border-gray-300 rounded'
+                /> */}
+                <Controller
+                  control={control}
+                  name={`education.${educationIndex}.start`}
+                  render={({ field }) => (
+                    <DatePicker
+                      className='p-2 border border-black rounded w-full personal-info-input'
+                      selected={field.value ? new Date(field.value) : null}
+                      onChange={(date) => field.onChange(date?.toISOString() || null)}
+                      placeholderText="Please Enter Start Date"
+                      showYearDropdown
+                      scrollableYearDropdown
+                    />
+                  )}
+                />
+                {/* <input
+                  {...register(`education.${educationIndex}.end`)}
+                  placeholder='Enter end date'
+                  className='p-2 border border-gray-300 rounded'
+                /> */}
+                <Controller
+                  control={control}
+                  name={`education.${educationIndex}.end`}
+                  render={({ field }) => (
+                    <DatePicker
+                      className='p-2 border border-black rounded w-full personal-info-input'
+                      selected={field.value ? new Date(field.value) : null}
+                      onChange={(date) => field.onChange(date?.toISOString() || null)}
+                      placeholderText="Please Enter End Date"
+                      showYearDropdown
+                      scrollableYearDropdown
+                    />
+                  )}
+                />
+                {/* <input
+                    {...register(`education.${educationIndex}.gradeType`)}
+                    placeholder='Enter your grade type'
+                    className='p-2 border border-gray-300 rounded'
+                  /> */}
+                <Controller
+                  name={`education.${educationIndex}.gradeType`}
+                  control={control}
+                  render={({ field }) => (
+                    <select {...field} onMouseDown={() => setIsClicked(true)} onKeyDown={() => setIsClicked(true)}
+                      className='p-2 border border-black rounded w-full personal-info-input col-span-1'
+                    >
+                      <option value="">Select Grade Type</option>
+                      <option value="CGPA">CGPA</option>
+                      <option value="SGPA">SGPA</option>
+                      <option value="%">Percentage</option>
+                    </select>
+                  )}
+                />
+                {
+                  (watchedEducation[educationIndex]?.gradeType === 'CGPA' ||
+                    watchedEducation[educationIndex]?.gradeType === 'SGPA' ||
+                    watchedEducation[educationIndex]?.gradeType === '%') && (
+                    <Controller
+                      name={`education.${educationIndex}.grade`}
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          className='p-2 border border-black rounded w-full personal-info-input col-span-1'
+                          placeholder='Enter your grade'
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setIsClicked(true);
+                          }}
+                        />
+                      )}
+                    />
+                  )
+                }
+                <button
+                  className='bg-red-500 text-white personal-info-input font-bold p-2 rounded col-span-2'
+                  onClick={() => {
+                    console.log('Removing project at index:', educationIndex);
+                    setIsClicked(true);
+                    removeEducation(educationIndex)
+                  }}
+                >
+                  Remove Education
+                </button>
+              </div>
+            ))
+          }
+          <button
+            className='bg-[#fee68e] w-fit text-black personal-info-input font-bold p-2 rounded col-span-2 ml-4 flex items-center gap-2'
+            onClick={() => { setIsClicked(true); appendEducation({ degree: '', college: '', start: '', end: '', grade: 0, gradeType: '' }) }}
+          >
+            <FaPlus />
+            <p>Add Education</p>
+          </button>
         </div>
 
         <div className='border-2 mx-3 py-5 border-black bg-[#F8F5E9] rounded-md'>
@@ -521,125 +639,7 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        <div className='border-2 mx-3 py-5 border-black bg-[#fff4ef] rounded-md flex flex-col gap-3'>
-          <div className='flex gap-2 px-4 my-4 items-center'>
-            <BiSolidBriefcase />
-            <h2>Education Details</h2>
-          </div>
-          {
-            educationFields.map((_, educationIndex) => (
-              <div key={educationIndex} className=' grid grid-cols-2 gap-4 px-4'>
-                <input
-                  {...register(`education.${educationIndex}.degree`)}
-                  placeholder='Enter your degree'
-                  className='p-2 border border-black rounded w-full personal-info-input'
-                />
-                <input
-                  {...register(`education.${educationIndex}.college`)}
-                  placeholder='Enter your college name'
-                  className='p-2 border border-black rounded w-full personal-info-input'
-                />
-                {/* <input
-                  {...register(`education.${educationIndex}.start`)}
-                  placeholder='Enter start date'
-                  className='p-2 border border-gray-300 rounded'
-                /> */}
-                <Controller
-                  control={control}
-                  name={`education.${educationIndex}.start`}
-                  render={({ field }) => (
-                    <DatePicker
-                      className='p-2 border border-black rounded w-full personal-info-input'
-                      selected={field.value ? new Date(field.value) : null}
-                      onChange={(date) => field.onChange(date?.toISOString() || null)}
-                      placeholderText="Please Enter Start Date"
-                      showYearDropdown
-                      scrollableYearDropdown
-                    />
-                  )}
-                />
-                {/* <input
-                  {...register(`education.${educationIndex}.end`)}
-                  placeholder='Enter end date'
-                  className='p-2 border border-gray-300 rounded'
-                /> */}
-                <Controller
-                  control={control}
-                  name={`education.${educationIndex}.end`}
-                  render={({ field }) => (
-                    <DatePicker
-                      className='p-2 border border-black rounded w-full personal-info-input'
-                      selected={field.value ? new Date(field.value) : null}
-                      onChange={(date) => field.onChange(date?.toISOString() || null)}
-                      placeholderText="Please Enter End Date"
-                      showYearDropdown
-                      scrollableYearDropdown
-                    />
-                  )}
-                />
-                {/* <input
-                    {...register(`education.${educationIndex}.gradeType`)}
-                    placeholder='Enter your grade type'
-                    className='p-2 border border-gray-300 rounded'
-                  /> */}
-                <Controller
-                  name={`education.${educationIndex}.gradeType`}
-                  control={control}
-                  render={({ field }) => (
-                    <select {...field} onMouseDown={() => setIsClicked(true)} onKeyDown={() => setIsClicked(true)}
-                      className='p-2 border border-black rounded w-full personal-info-input'
-                    >
-                      <option value="">Select Grade Type</option>
-                      <option value="CGPA">CGPA</option>
-                      <option value="SGPA">SGPA</option>
-                      <option value="%">Percentage</option>
-                    </select>
-                  )}
-                />
-                {
-                  (educationFields[educationIndex].gradeType === 'CGPA' ||
-                    educationFields[educationIndex].gradeType === 'SGPA' ||
-                    educationFields[educationIndex].gradeType === '%') && (
-                    <Controller
-                      name={`education.${educationIndex}.grade`}
-                      control={control}
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          className='p-2 border border-black rounded w-full personal-info-input'
-                          placeholder='Enter your grade'
-                          onChange={(e) => {
-                            field.onChange(e.target.value);
-                            setIsClicked(true);
-                          }}
-                        />
-                      )}
-                    />
-                  )
-                }
-                <button
-                  className='bg-red-500 text-white personal-info-input font-bold p-2 rounded col-span-2'
-                  onClick={() => {
-                    console.log('Removing project at index:', educationIndex);
-                    setIsClicked(true);
-                    removeEducation(educationIndex)
-                  }}
-                >
-                  Remove Education
-                </button>
-              </div>
-            ))
-          }
-          <button
-            className='bg-[#fee68e] w-fit text-black personal-info-input font-bold p-2 rounded col-span-2 ml-4 flex items-center gap-2'
-            onClick={() => { setIsClicked(true); appendEducation({ degree: '', college: '', start: '', end: '', grade: 0, gradeType: '' }) }}
-          >
-            <FaPlus />
-            <p>Add Education</p>
-          </button>
-        </div>
-        <div>
-        </div>
+
         <div className=' border-2 mx-3 py-2 mb-4 border-black bg-[#EFF6FF] rounded-md personal-info-input'>
           <input type="submit" className='w-full cursor-pointer' />
         </div>
