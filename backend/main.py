@@ -9,7 +9,7 @@ from models import User , Base
 from database import engine , get_db
 from auth import create_access_token
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import UserCreate
+from schemas import UserCreate, TextOptimizationRequest
 from jose import jwt ,JWTError
 from dotenv import load_dotenv
 from google.auth.transport import requests
@@ -17,6 +17,7 @@ from google.oauth2 import id_token
 from core.config import settings
 import httpx
 from fastapi.responses import RedirectResponse
+import openai
 
 load_dotenv()
 
@@ -192,3 +193,16 @@ async def github_code(code: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post("/text-optimze")
+async def text_optimize(request:TextOptimizationRequest):
+    messages = [{"role":"user","content":f"Optimize this text for software developer or software engineering roles:{text}"} for text in request.texts]
+    for text in request.texts:
+        response = openai.Completion.create(
+            model = "gpt-3.5-turbo",
+            messages = messages
+        )
+
+    optimized_texts = response['choices'][0]['message']['content'].split('\n')
+    return {"optimized_texts":optimized_texts}
