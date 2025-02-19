@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, SubmitHandler, useFieldArray, Controller, useWatch } from 'react-hook-form';
+import useFormPersist from "react-hook-form-persist";
 import { technicalSkills } from '@/data/skills';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,6 +24,7 @@ const App: React.FC = () => {
   useEffect(() => {
     setIsClicked(false)
   }, [isClicked])
+
 
   const { register, handleSubmit, setValue, control } = useForm<FormData>({
     defaultValues: {
@@ -69,6 +71,13 @@ const App: React.FC = () => {
         gradeType: '',
       }],
     }
+  });
+
+  useFormPersist('resumeForm', {
+    watch: (names) => useWatch({ control, name: names as any }),
+    // watch:useWatch({control}),
+    setValue,
+    storage: window.localStorage, // or window.sessionStorage
   });
 
   const { fields: experienceFields, append: appendExperience, remove: removeExperience } = useFieldArray({

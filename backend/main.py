@@ -17,7 +17,7 @@ from google.oauth2 import id_token
 from core.config import settings
 import httpx
 from fastapi.responses import RedirectResponse
-import openai
+from openai import OpenAI
 
 load_dotenv()
 
@@ -195,14 +195,31 @@ async def github_code(code: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@app.post("/text-optimze")
-async def text_optimize(request:TextOptimizationRequest):
-    messages = [{"role":"user","content":f"Optimize this text for software developer or software engineering roles:{text}"} for text in request.texts]
-    for text in request.texts:
-        response = openai.Completion.create(
-            model = "gpt-3.5-turbo",
-            messages = messages
-        )
+client = OpenAI(
+    api_key = settings.OPENAI_API_KEY
+)
 
-    optimized_texts = response['choices'][0]['message']['content'].split('\n')
-    return {"optimized_texts":optimized_texts}
+@app.post("/text-optimze")
+async def text_optimize(request: TextOptimizationRequest):
+    optimized_texts = []
+    for text in request.texts:
+        messages = [
+            {
+                "role":"user",
+                "content":(
+                    f"Opimize this text for software developer or software engineer job description: \n{text}\n\n"
+                )
+            }
+        ]
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        
+        optimized_text = response.choices[0].message.content.strip()
+        optimized_texts.append(optimized_text)
+
+    return {"optimized_texts": optimized_texts}

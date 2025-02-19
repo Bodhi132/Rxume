@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     AUTH_GOOGLE_SECRET: str
     AUTH_GITHUB_CLIENT_ID: str
     AUTH_GITHUB_CLIENT_SECRET: str
+    OPENAI_API_KEY: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

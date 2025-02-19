@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import List
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -9,4 +10,4 @@ class UserLogin(BaseModel):
     password: str
 
 class TextOptimizationRequest(BaseModel):
-    text: str
+    texts: List[str]
