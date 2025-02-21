@@ -199,15 +199,61 @@ client = OpenAI(
     api_key = settings.OPENAI_API_KEY
 )
 
-@app.post("/text-optimze")
+@app.post("/work-experience-optimze")
 async def text_optimize(request: TextOptimizationRequest):
     optimized_texts = []
     for text in request.texts:
         messages = [
             {
-                "role":"user",
-                "content":(
-                    f"Opimize this text for software developer or software engineer job description: \n{text}\n\n"
+                "role": "system",
+                "content": "You are an AI assistant that helps improve resume content. Make the texts professional and crisp."
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"These are the work experiences that are in the resume and I want to improve them: \n{text}\n\n"
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    "Reorder the points in a logical and impactful sequence."
+                )
+            }
+        ]
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        
+        optimized_text = response.choices[0].message.content.strip()
+        optimized_texts.append(optimized_text)
+
+    return {"optimized_texts": optimized_texts}
+
+
+@app.post("/project-desc-optimze")
+async def text_optimize(request: TextOptimizationRequest):
+    optimized_texts = []
+    for text in request.texts:
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an AI assistant that helps improve resume content. Make the texts professional and crisp."
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"These are the project descriptions that I have created and these are in the resume and I want to improve them: \n{text}\n\n"
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    "Reorder the points in a logical and impactful sequence."
                 )
             }
         ]

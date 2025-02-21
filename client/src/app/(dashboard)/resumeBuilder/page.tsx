@@ -73,12 +73,13 @@ const App: React.FC = () => {
     }
   });
 
-  useFormPersist('resumeForm', {
-    watch: (names) => useWatch({ control, name: names as any }),
-    // watch:useWatch({control}),
-    setValue,
-    storage: window.localStorage, // or window.sessionStorage
-  });
+  if (typeof window !== 'undefined') {
+    useFormPersist('resumeForm', {
+      watch: (names) => useWatch({ control, name: names as any }),
+      setValue,
+      storage: window.localStorage, // or window.sessionStorage
+    });
+  }
 
   const { fields: experienceFields, append: appendExperience, remove: removeExperience } = useFieldArray({
     control,
@@ -670,6 +671,9 @@ const App: React.FC = () => {
       </div>
       <div className='w-full px-4 flex justify-center my-3'>
         <button className='bg-[#EFF3EA] border-black w-4/6 p-4 block rounded-md personal-info-input font-semibold' onClick={handleOptimize}> OPTIMIZE </button>
+      </div>
+      <div className=' w-full h-[100vh] '>
+        
       </div>
     </div>
   );
