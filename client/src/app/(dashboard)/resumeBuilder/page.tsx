@@ -4,6 +4,7 @@ import { useForm, SubmitHandler, useFieldArray, Controller, useWatch } from 'rea
 import useFormPersist from "react-hook-form-persist";
 import { technicalSkills } from '@/data/skills';
 import DatePicker from "react-datepicker";
+// import PdfViewer from '@/app/components/PdfViewer';
 import "react-datepicker/dist/react-datepicker.css";
 import './styles.css';
 import { FaUser } from "react-icons/fa6";
@@ -13,6 +14,7 @@ import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
 import { IoCodeSlash } from "react-icons/io5";
 import { BiBriefcase, BiSolidBriefcase } from "react-icons/bi";
+import OptimizedResume from '@/app/components/OptimizedResume';
 import dynamic from 'next/dynamic';
 
 const PdfViewer = dynamic(() => import('@/app/components/PdfViewer'), { ssr: false });
@@ -20,6 +22,7 @@ const PdfViewer = dynamic(() => import('@/app/components/PdfViewer'), { ssr: fal
 const App: React.FC = () => {
 
   const [isClicked, setIsClicked] = useState(false)
+  const [optmization, setOptmization] = useState(false)
 
   useEffect(() => {
     setIsClicked(false)
@@ -77,7 +80,7 @@ const App: React.FC = () => {
     useFormPersist('resumeForm', {
       watch: (names) => useWatch({ control, name: names as any }),
       setValue,
-      storage: window.localStorage, // or window.sessionStorage
+      storage: window.localStorage,
     });
   }
 
@@ -169,8 +172,7 @@ const App: React.FC = () => {
   }
 
   const handleOptimize = () => {
-    console.log('Optimizing...');
-    console.log(formData);
+    setOptmization(true)
   }
 
   const skills = Object.values(technicalSkills).flat();
@@ -253,7 +255,7 @@ const App: React.FC = () => {
               <h2 className="text-xl font-bold">Technical Skills</h2>
             </div>
             <div>
-              {Object.keys(technicalSkills).map((category) => (
+              {Object.keys(watchedTechnicalSkills).map((category) => (
                 <div key={category} className="mb-4 flex flex-col px-4 gap-2 ">
                   <h3 className="text-lg font-semibold">{category.toUpperCase()}</h3>
                   <div className="flex flex-col border border-black p-2 rounded personal-info-input bg-white">
@@ -407,7 +409,7 @@ const App: React.FC = () => {
               <h2 className='text-xl font-bold'>Education Details</h2>
             </div>
             {
-              educationFields.map((_, educationIndex) => (
+              watchedEducation.map((_, educationIndex) => (
                 <div key={educationIndex} className=' grid grid-cols-2 gap-4 px-4'>
                   <input
                     {...register(`education.${educationIndex}.college`)}
@@ -525,7 +527,7 @@ const App: React.FC = () => {
               <h2 className="text-xl font-bold ">PROJECT TITLE</h2>
             </div>
             {
-              projectFields.map((_, projectIndex) => (
+              watchedProjects.map((_, projectIndex) => (
                 <div key={projectIndex} className='mb-4 flex flex-col px-4 gap-4 '>
 
                   <input {...register(`projects.${projectIndex}.name`)}
@@ -673,7 +675,7 @@ const App: React.FC = () => {
         <button className='bg-[#EFF3EA] border-black w-4/6 p-4 block rounded-md personal-info-input font-semibold' onClick={handleOptimize}> OPTIMIZE </button>
       </div>
       <div className=' w-full h-[100vh] '>
-        
+        <OptimizedResume />
       </div>
     </div>
   );
