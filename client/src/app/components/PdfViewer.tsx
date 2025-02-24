@@ -25,11 +25,11 @@ const styles = StyleSheet.create({
 
 // PDF Document Component
 const PdfViewer = (props: any) => {
-    const formData = props.formData;
-    const hasEmptyTechSkills = Object.values(formData.technicalSkills).some(arr => Array.isArray(arr) && arr.length === 0);
-    const hasEmptyExperience = Object.values(formData.experience).some(arr => Array.isArray(arr) && arr.length === 0);
-    const hasEmptyEducation = Object.values(formData.education).some(arr => Array.isArray(arr) && arr.length === 0);
-    const hasEmptyProjects = Object.values(formData.projects).some(arr => Array.isArray(arr) && arr.length === 0);
+    const formData = props?.formData;
+    const hasEmptyTechSkills = Object?.values(formData.technicalSkills)?.some(arr => Array.isArray(arr) && arr.length === 0);
+    const hasEmptyExperience = Object?.values(formData.experience)?.some(arr => Array.isArray(arr) && arr.length === 0);
+    const hasEmptyEducation = Object?.values(formData.education)?.some(arr => Array.isArray(arr) && arr.length === 0);
+    const hasEmptyProjects = Object?.values(formData.projects)?.some(arr => Array.isArray(arr) && arr.length === 0);
 
     return (
         <PDFViewer width="100%" height="100%">
@@ -72,7 +72,7 @@ const PdfViewer = (props: any) => {
                                 TECHNICAL SKILLS :
                             </Text>
                             <View style={{ marginLeft: '35px', flexDirection: 'column', gap: '4px', }}>
-                                {formData.technicalSkills.frontend.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                {formData.technicalSkills.frontend?.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>Frontend -</Text>
                                     <Text>{formData?.technicalSkills?.frontend.join(", ")}</Text>
                                 </View>}
@@ -97,7 +97,7 @@ const PdfViewer = (props: any) => {
                                         Tools -
                                     </Text>
                                     <Text>
-                                        {formData?.technicalSkills?.tools.join(", ")}
+                                        {formData?.technicalSkills?.tools?.join(", ")}
                                     </Text>
                                 </View>
                                 }
@@ -139,11 +139,11 @@ const PdfViewer = (props: any) => {
                                         <View style={{ marginVertical: '7px', fontWeight: 'medium' }}>
                                             {
                                                 experience.description.length > 0 && experience?.description?.map((description: string, index: number) => {
-                                                    description !== "" &&
+                                                    return (description !== "" &&
                                                         <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
                                                             <Text style={{ fontWeight: 'bold', fontSize: '11px' }}>{'\u2022'}</Text>
                                                             <Text key={index}>{description}</Text>
-                                                        </View>
+                                                        </View>)
                                                 }
                                                 )
                                             }
@@ -179,7 +179,8 @@ const PdfViewer = (props: any) => {
                             ))
                         }
                     </View>}
-                    {!hasEmptyProjects && <View>
+                    {!hasEmptyProjects && 
+                    <View>
                         <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '10px', marginLeft: '15px', marginBottom: '10px' }}>PROJECTS :</Text>
                         {
                             formData?.projects?.map((project: any, index: number) => (
@@ -213,7 +214,7 @@ const PdfViewer = (props: any) => {
                                             project?.description.map((description: string, index: number) => {
                                                 return description !== null && (
                                                     <View style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '10px', marginVertical: '1px', paddingHorizontal: '15px' }} key={index}>
-                                                         <Text style={{ fontWeight: 'bold', fontSize: '12px' }}>{'\u2022'}</Text>
+                                                        <Text style={{ fontWeight: 'bold', fontSize: '12px' }}>{'\u2022'}</Text>
                                                         <Text>{description}</Text>
                                                     </View>
                                                 )
@@ -223,7 +224,8 @@ const PdfViewer = (props: any) => {
                                 </View>
                             ))
                         }
-                    </View>}
+                    </View>
+                    }
                 </Page>
             </Document>
         </PDFViewer>

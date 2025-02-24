@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
-import { useForm, SubmitHandler, useFieldArray, Controller, useWatch } from 'react-hook-form';
+import { useForm, SubmitHandler, useFieldArray, Controller, useWatch, set } from 'react-hook-form';
 import useFormPersist from "react-hook-form-persist";
 import { technicalSkills } from '@/data/skills';
 import DatePicker from "react-datepicker";
@@ -18,19 +18,43 @@ import OptimizedResume from '@/app/components/OptimizedResume';
 import dynamic from 'next/dynamic';
 
 const PdfViewer = dynamic(() => import('@/app/components/PdfViewer'), { ssr: false });
+const OptimisedPdf = dynamic(() => import('@/app/components/OptimizedResume'), { ssr: false });
 
 const App: React.FC = () => {
 
   const [isClicked, setIsClicked] = useState(false)
   const [optmization, setOptmization] = useState(false)
+  const [localFormData, setlocalFormData] = useState('')
 
   useEffect(() => {
     setIsClicked(false)
   }, [isClicked])
 
+  // useEffect(() => {
+  //   setlocalFormData(window.localStorage.getItem('resumeForm') || {})
+  // }, [])
+
+  useEffect(() => {
+    setOptmization(false)
+  }, [localStorage.getItem("resumeForm")])
+
+
+  const getStoredFormData = (): FormData | undefined => {
+    if (typeof window !== "undefined") {
+      const storedData = localStorage.getItem("resumeForm");
+      if (storedData) {
+        try {
+          return JSON.parse(storedData) as FormData;
+        } catch (error) {
+          console.error("Error parsing localStorage data:", error);
+        }
+      }
+    }
+    return undefined;
+  }
 
   const { register, handleSubmit, setValue, control } = useForm<FormData>({
-    defaultValues: {
+    defaultValues: getStoredFormData() || {
       userInfo: {
         name: '',
         phone: undefined,
@@ -76,13 +100,55 @@ const App: React.FC = () => {
     }
   });
 
-  if (typeof window !== 'undefined') {
-    useFormPersist('resumeForm', {
-      watch: (names) => useWatch({ control, name: names as any }),
-      setValue,
-      storage: window.localStorage,
-    });
-  }
+  useFormPersist('resumeForm', {
+    watch: (names) => useWatch({ control, name: names as any }),
+    setValue,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+  });
+
+  // useEffect(() => {
+  //   const localData = localStorage.getItem('resumeForm');
+  //   if (localData) {
+  //     const parsedData = JSON.parse(localData);
+  //     setValue('userInfo', parsedData.userInfo || {});
+  //     setValue('technicalSkills', parsedData.technicalSkills || {});
+  //     setValue('experience', parsedData.experience || []);
+  //     setValue('projects', parsedData.projects || []);
+  //     setValue('education', parsedData.education || []);
+  //   }
+  // }, [setValue]);
+
+  // useEffect(() => {
+  //   const localStorageData = localStorage.getItem('resumeForm');
+  //   if(localStorageData)
+  //   setlocalFormData(localStorageData)
+  // }, [])
+
+  // useEffect(() => {
+  //   console.log(localFormData)
+  //   const parsedData = JSON.parse(localFormData || '{}');
+  //   setIsClicked(true)
+  //   setValue('technicalSkills', parsedData.technicalSkills || {});
+  // }, [localFormData])
+
+
+
+
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined' && window.localStorage) {
+  //     const persistData = localStorage.getItem('resumeForm');
+  //     if (!persistData) return;
+  //     setlocalFormData(persistData)
+  //     const data = JSON.parse(persistData);
+  //     setValue('userInfo', data.userInfo);
+  //     setValue('technicalSkills', data.technicalSkills);
+  //     setValue('experience', data.experience);
+  //     setValue('projects', data.projects);
+  //     setValue('education', data.education);
+  //   }
+
+  // }, [])
+
 
   const { fields: experienceFields, append: appendExperience, remove: removeExperience } = useFieldArray({
     control,
@@ -103,6 +169,25 @@ const App: React.FC = () => {
   const watchedExperience = useWatch({ control, name: 'experience' });
   const watchedProjects = useWatch({ control, name: 'projects' });
   const watchedEducation = useWatch({ control, name: 'education' });
+
+  // useEffect(() => {
+  //   const localData = localStorage.getItem('resumeForm');
+  //   setlocalFormData(localData ?? "")
+  // }, [])
+
+  // useEffect(() => {
+  //   if (!localFormData) return; // Prevents parsing null or empty strings
+
+  //   try {
+  //     const parsedData = JSON.parse(localFormData);
+  //     if (parsedData) {
+  //       console.log('Parsed Data:', parsedData.technicalSkills);
+  //       setValue("technicalSkills", parsedData.technicalSkills || {});
+  //     }
+  //   } catch (error) {
+  //     console.error("Invalid JSON in localStorage:", error);
+  //   }
+  // }, [localFormData, setValue]); 
 
   const [inputValues, setInputValues] = useState({
     frontend: '',
@@ -170,6 +255,31 @@ const App: React.FC = () => {
     setValue(`projects.${index}.techStack`, [...watchedProjects[index].techStack, skill]);
     setProjectSkill('');
   }
+
+  // useEffect(() => {
+  //   console.log('Resume Form', localStorage.getItem('resumeForm'));
+  //   setlocalFormData(localStorage.getItem('resumeForm') || '')
+  // }, [localStorage.getItem('resumeForm')])
+
+  const [loaded, setLoaded] = useState(false)
+
+  // useEffect(() => {
+  //   const storedData = localStorage.getItem("resumeForm");
+  //   const hasEmptyTechSkills = Object?.values(storedData.technicalSkills)?.some(arr => Array.isArray(arr) && arr.length === 0);
+  //   if (storedData) {
+  //     try {
+  //       const parsedData: FormData = JSON.parse(storedData);
+  //       if (parsedData.technicalSkills) {
+  //         setValue("technicalSkills", parsedData.technicalSkills);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error parsing localStorage data:", error);
+  //     }
+  //   }
+  //   setLoaded(true);
+  // }, [setValue])
+
+
 
   const handleOptimize = () => {
     setOptmization(true)
@@ -260,15 +370,17 @@ const App: React.FC = () => {
                   <h3 className="text-lg font-semibold">{category.toUpperCase()}</h3>
                   <div className="flex flex-col border border-black p-2 rounded personal-info-input bg-white">
                     <div className='flex flex-wrap gap-2'>
-                      {watchedTechnicalSkills[category as keyof typeof technicalSkills].map((skill, index) => (
-                        <button
-                          key={index}
-                          className="m-1 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 personal-info-input"
-                          onClick={() => handleRemoveSkill(skill, category as keyof typeof technicalSkills)}
-                        >
-                          {skill} &times;
-                        </button>
-                      ))}
+                      {
+                        watchedTechnicalSkills[category as keyof typeof technicalSkills].map((skill, index) => (
+                          <button
+                            key={index}
+                            className="m-1 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 personal-info-input"
+                            onClick={() => handleRemoveSkill(skill, category as keyof typeof technicalSkills)}
+                          >
+                            {skill} &times;
+                          </button>
+                        ))
+                      }
                     </div>
                     <div className="flex flex-col ">
                       <input
@@ -674,9 +786,10 @@ const App: React.FC = () => {
       <div className='w-full px-4 flex justify-center my-3'>
         <button className='bg-[#EFF3EA] border-black w-4/6 p-4 block rounded-md personal-info-input font-semibold' onClick={handleOptimize}> OPTIMIZE </button>
       </div>
-      <div className=' w-full h-[100vh] '>
-        <OptimizedResume />
-      </div>
+      {optmization &&
+        <div className=' w-full h-[100vh] '>
+          <OptimisedPdf />
+        </div>}
     </div>
   );
 };

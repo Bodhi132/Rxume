@@ -255,7 +255,7 @@ async def text_optimize(request: TextOptimizationRequest):
                 "content": (
                     "Reorder the points in a logical and impactful sequence."
                 )
-            }
+            },
         ]
         try:
             response = client.chat.completions.create(
