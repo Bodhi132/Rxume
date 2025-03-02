@@ -17,6 +17,7 @@ from google.oauth2 import id_token
 from core.config import settings
 import httpx
 from fastapi.responses import RedirectResponse
+from playwright.sync_api import sync_playwright
 from openai import OpenAI
 
 load_dotenv()
@@ -269,3 +270,26 @@ async def text_optimize(request: TextOptimizationRequest):
         optimized_texts.append(optimized_text)
 
     return {"optimized_texts": optimized_texts}
+
+@app.post("/job-scraper")
+def scrape_job_description(url):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        )
+        page = context.new_page()
+        page.goto(url,timeout=60000)
+
+        try:
+            page.wait_for_selector(".mt4",timeout=5000)
+            job_description = page.locator(".mt4").inner_text()
+        except:
+            job_description = "Job description not found"
+
+            browser.close()
+
+            return{
+                "job_description":job_description
+            }
+
