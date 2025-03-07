@@ -1,23 +1,23 @@
-from fastapi import FastAPI , Depends , HTTPException , status
+from fastapi import FastAPI, Depends, HTTPException, status , BackgroundTasks
 from authlib.integrations.starlette_client import OAuth
 from starlette.requests import Request
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from models import User , Base
-from database import engine , get_db
+from models import User, Base
+from database import engine, get_db
 from auth import create_access_token
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import UserCreate, TextOptimizationRequest
-from jose import jwt ,JWTError
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from core.config import settings
 import httpx
 from fastapi.responses import RedirectResponse
-from playwright.sync_api import sync_playwright
+from scraper import scrape_linkedin_job_description
 from openai import OpenAI
 
 load_dotenv()
@@ -48,9 +48,10 @@ oauth.register(
     client_secret=settings.AUTH_GOOGLE_SECRET,
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={
-        'scope': 'email openid profile',
-    }
+        "scope": "email openid profile",
+    },
 )
+
 
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -66,50 +67,60 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     # Hash the password and create a new user
     hashed_password = pwd_context.hash(user.password)
     new_user = User(email=user.email, hashed_password=hashed_password)
-    
+
     # Add the new user to the database
     db.add(new_user)
     db.commit()
-    
+
     # Refresh the instance to get the updated state from the database
     db.refresh(new_user)
-    
+
     return {"msg": "User registered successfully", "user_id": new_user.id}
 
 
 @app.post("/token")
-def login(userData:UserCreate, db:Session=Depends(get_db)):
-    user = db.query(User).filter(User.email==userData.email).first()
+def login(userData: UserCreate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == userData.email).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
-    if not pwd_context.verify(userData.password,user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Incorrect password")
-    access_token = create_access_token(data={"sub":user.email})
-    return {"access_token":access_token,"token_type":"bearer"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if not pwd_context.verify(userData.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password"
+        )
+    access_token = create_access_token(data={"sub": user.email})
+    return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get('/auth/login/google')
+
+@app.get("/auth/login/google")
 async def login_via_google(request: Request):
-    redirect_uri = 'http://localhost:8000/api/auth/callback/google'
+    redirect_uri = "http://localhost:8000/api/auth/callback/google"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
-@app.get('/api/auth/callback/google')
+
+@app.get("/api/auth/callback/google")
 async def google_callback(request: Request, db: Session = Depends(get_db)):
     try:
         if not inspect(engine).has_table("users"):
             Base.metadata.create_all(bind=engine)
-        
+
         # print(request)
         token = await oauth.google.authorize_access_token(request)
         # print("Token received:", token)
-        if 'id_token' not in token:
-            raise HTTPException(status_code=401, detail="ID token missing in token response")
-        idinfo = id_token.verify_oauth2_token(token['id_token'], requests.Request(), settings.AUTH_GOOGLE_ID)
+        if "id_token" not in token:
+            raise HTTPException(
+                status_code=401, detail="ID token missing in token response"
+            )
+        idinfo = id_token.verify_oauth2_token(
+            token["id_token"], requests.Request(), settings.AUTH_GOOGLE_ID
+        )
         print("ID info:", idinfo)
         user_data = User(
             id=idinfo["sub"],
             name=idinfo["name"],
             email=idinfo["email"],
-            img=idinfo["picture"]
+            img=idinfo["picture"],
         )
         user = db.query(User).filter(User.id == user_data.id).first()
         if not user:
@@ -122,7 +133,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
             user.img = user_data.img
             db.commit()
             db.refresh(user)
-        
+
         access_token = create_access_token(data={"sub": user_data.id})
         response = RedirectResponse(url="http://localhost:3000/resumeBuilder")
         response.set_cookie(key="access_token", value=access_token, httponly=True)
@@ -131,48 +142,59 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-@app.get('/auth/login/github')
-async def github_login(request: Request):
-    return RedirectResponse(f'https://github.com/login/oauth/authorize?client_id={settings.AUTH_GITHUB_CLIENT_ID}&status_code=302')
 
-@app.get('/api/auth/callback/github')
+
+@app.get("/auth/login/github")
+async def github_login(request: Request):
+    return RedirectResponse(
+        f"https://github.com/login/oauth/authorize?client_id={settings.AUTH_GITHUB_CLIENT_ID}&status_code=302"
+    )
+
+
+@app.get("/api/auth/callback/github")
 async def github_code(code: str, db: Session = Depends(get_db)):
     try:
         if not inspect(engine).has_table("users"):
             Base.metadata.create_all(bind=engine)
 
         params = {
-            'client_id': settings.AUTH_GITHUB_CLIENT_ID,
-            'client_secret': settings.AUTH_GITHUB_CLIENT_SECRET,
-            'code': code,
+            "client_id": settings.AUTH_GITHUB_CLIENT_ID,
+            "client_secret": settings.AUTH_GITHUB_CLIENT_SECRET,
+            "code": code,
         }
-        headers = {'Accept': 'application/json'}
+        headers = {"Accept": "application/json"}
         async with httpx.AsyncClient() as client:
-            response = await client.post(url="https://github.com/login/oauth/access_token", params=params, headers=headers)
+            response = await client.post(
+                url="https://github.com/login/oauth/access_token",
+                params=params,
+                headers=headers,
+            )
             response_json = response.json()
             print(response_json)
-            access_token = response_json['access_token']
-            headers.update({'Authorization': f'token {access_token}'})
-            
+            access_token = response_json["access_token"]
+            headers.update({"Authorization": f"token {access_token}"})
+
             # Fetch user profile
-            response = await client.get(url="https://api.github.com/user", headers=headers)
+            response = await client.get(
+                url="https://api.github.com/user", headers=headers
+            )
             user_profile = response.json()
             print(user_profile)
-            
+
             # Fetch user emails
-            response = await client.get(url="https://api.github.com/user/emails", headers=headers)
+            response = await client.get(
+                url="https://api.github.com/user/emails", headers=headers
+            )
             emails = response.json()
             print(emails)
 
+            primary_email = next(email["email"] for email in emails if email["primary"])
 
-            primary_email = next(email['email'] for email in emails if email['primary'])
-            
             user_data = User(
                 id=str(user_profile["id"]),
                 name=user_profile["name"],
                 email=primary_email,
-                img=user_profile["avatar_url"]
+                img=user_profile["avatar_url"],
             )
             user = db.query(User).filter(User.id == user_data.id).first()
             if not user:
@@ -194,11 +216,10 @@ async def github_code(code: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
 
-client = OpenAI(
-    api_key = settings.OPENAI_API_KEY
-)
+
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
 
 @app.post("/work-experience-optimze")
 async def text_optimize(request: TextOptimizationRequest):
@@ -207,29 +228,26 @@ async def text_optimize(request: TextOptimizationRequest):
         messages = [
             {
                 "role": "system",
-                "content": "You are an AI assistant that helps improve resume content. Make the texts professional and crisp."
+                "content": "You are an AI assistant that helps improve resume content. Make the texts professional and crisp.",
             },
             {
                 "role": "user",
                 "content": (
                     f"These are the work experiences that are in the resume and I want to improve them: \n{text}\n\n"
-                )
+                ),
             },
             {
                 "role": "user",
-                "content": (
-                    "Reorder the points in a logical and impactful sequence."
-                )
-            }
+                "content": ("Reorder the points in a logical and impactful sequence."),
+            },
         ]
         try:
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=messages
+                model="gpt-3.5-turbo", messages=messages
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        
+
         optimized_text = response.choices[0].message.content.strip()
         optimized_texts.append(optimized_text)
 
@@ -243,53 +261,36 @@ async def text_optimize(request: TextOptimizationRequest):
         messages = [
             {
                 "role": "system",
-                "content": "You are an AI assistant that helps improve resume content. Make the texts professional and crisp."
+                "content": "You are an AI assistant that helps improve resume content. Make the texts professional and crisp.",
             },
             {
                 "role": "user",
                 "content": (
                     f"These are the project descriptions that I have created and these are in the resume and I want to improve them: \n{text}\n\n"
-                )
+                ),
             },
             {
                 "role": "user",
-                "content": (
-                    "Reorder the points in a logical and impactful sequence."
-                )
+                "content": ("Reorder the points in a logical and impactful sequence."),
             },
         ]
         try:
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=messages
+                model="gpt-3.5-turbo", messages=messages
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        
+
         optimized_text = response.choices[0].message.content.strip()
         optimized_texts.append(optimized_text)
 
     return {"optimized_texts": optimized_texts}
 
-@app.post("/job-scraper")
-def scrape_job_description(url):
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-        )
-        page = context.new_page()
-        page.goto(url,timeout=60000)
 
-        try:
-            page.wait_for_selector(".mt4",timeout=5000)
-            job_description = page.locator(".mt4").inner_text()
-        except:
-            job_description = "Job description not found"
-
-            browser.close()
-
-            return{
-                "job_description":job_description
-            }
-
+@app.post("/linkedin-job-description")
+async def start_scraping(url: str):
+    try:
+        result = scrape_linkedin_job_description(url) 
+        return {"job_description": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

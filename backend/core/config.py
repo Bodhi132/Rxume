@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     AUTH_GITHUB_CLIENT_ID: str
     AUTH_GITHUB_CLIENT_SECRET: str
     OPENAI_API_KEY: str
+    Linkedin_Email: str
+    Linkedin_Password: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
