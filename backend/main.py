@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status , BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, status , BackgroundTasks , File , UploadFile
 from authlib.integrations.starlette_client import OAuth
 from starlette.requests import Request
 from starlette.middleware.sessions import SessionMiddleware
@@ -17,7 +17,10 @@ from google.oauth2 import id_token
 from core.config import settings
 import httpx
 from fastapi.responses import RedirectResponse
+import json
 from scraper import scrape_linkedin_job_description
+from parser import extract_text_from_pdf
+import re
 from openai import OpenAI
 
 load_dotenv()
@@ -287,10 +290,111 @@ async def text_optimize(request: TextOptimizationRequest):
     return {"optimized_texts": optimized_texts}
 
 
-@app.post("/linkedin-job-description")
-async def start_scraping(url: str):
+# @app.post("/linkedin-job-description")
+# async def start_scraping(url: str):
+#     try:
+#         result = scrape_linkedin_job_description(url) 
+#         return {"job_description": result}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+    
+# @app.post("/resume-tailor")
+# async def tailor_resume(file:UploadFile = File(...)):
+#     pdf = await file.read()
+#     try:
+#         text = extract_text_from_pdf(pdf)
+#         sections = extract_resume_sections(text)
+#         return {"text": text}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/resume-tailor")
+async def resume_tailor(job_url: str, file: UploadFile = File(...)):
+    """Parses resume and tailors it to a job description."""
+    
+    # Read and extract text from the uploaded resume PDF
+    pdf_bytes = await file.read()
+    text = extract_text_from_pdf(pdf_bytes)
+    
+    # OpenAI prompt to structure resume
+    resume_prompt = f"""
+    Extract and structure the following resume text into JSON format with these keys:
+    - Education
+    - Experience (company, role, duration, responsibilities)
+    - Skills
+    - Projects
+    - Links
+    - Achievements
+    
+    Resume Text:
+    {text}
+    
+    Output the structured resume in JSON format.
+    """
+    
+    resume_response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": resume_prompt}],
+        temperature=0.2
+    )
+
+    response_content = resume_response.choices[0].message.content.strip()
+
+    # Try extracting JSON between backticks
+    json_data = response_content.strip('`\n')
+
+    if json_data.startswith('json'):
+        resume_json = json_data[4:]
+
+    # Parse JSON safely
     try:
-        result = scrape_linkedin_job_description(url) 
-        return {"job_description": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        resume_json = json.loads(resume_json)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Failed to parse OpenAI JSON response: {e}\nResponse: {resume_json}")
+    
+    print("Parsed Resume",resume_json)
+    
+
+
+    # Scrape the job description
+    job_description = scrape_linkedin_job_description(job_url)
+
+    print(job_description)
+
+    # OpenAI prompt to tailor resume
+    tailor_prompt = f"""
+    Given the following resume JSON and job description, tailor the resume to better fit the job role.
+    
+    Resume JSON:
+    {json.dumps(resume_json, indent=2)}
+    
+    Job Description:
+    {job_description}
+    
+    Return the tailored resume in the same structured JSON format.
+    """
+    
+    tailor_response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are an AI that tailors resumes in JSON format to match job descriptions."},
+            {"role": "user", "content": tailor_prompt},
+            {"role": "user", "content": "Tailor the resume to better fit the job role."},
+            {"role": "user", "content": "Make the project descriptions more relevant to the job, professional,crisp,descriptive and improve all the description points."},
+            {"role": "user", "content": "Make the work experience more relevant to the job, professional,crisp,descriptive and improve all the description points."},
+        ],
+        temperature=0.4
+    )
+
+    print("tailored_resume", tailor_response.choices[0].message.content)
+
+    tailored_resume = tailor_response.choices[0].message.content
+
+    tailored_resume = tailored_resume.strip('`\n')
+
+    if tailored_resume.startswith('json'):
+        tailored_resume = tailored_resume[4:]
+    
+    tailored_resume = json.loads(tailored_resume)
+    
+    return {"tailored_resume": tailored_resume}
