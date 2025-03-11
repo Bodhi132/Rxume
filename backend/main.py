@@ -321,7 +321,7 @@ async def resume_tailor(job_url: str, file: UploadFile = File(...)):
     Extract and structure the following resume text into JSON format with these keys:
     - Education
     - Experience (company, role, duration, responsibilities)
-    - Skills
+    - Skills (categorized by Frotend, Backend, Devops, Databases, etc.)
     - Projects
     - Links
     - Achievements
@@ -398,3 +398,4 @@ async def resume_tailor(job_url: str, file: UploadFile = File(...)):
     tailored_resume = json.loads(tailored_resume)
     
     return {"tailored_resume": tailored_resume}
+
