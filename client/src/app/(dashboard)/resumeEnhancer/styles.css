@@ -2,7 +2,7 @@
     box-shadow: 10px 10px;
 }
 .personal-info-input{
-    box-shadow: 7px 7px black;
+    box-shadow: 7px 7px #341210;
 }
 ::-webkit-scrollbar {
     width: 10px;
