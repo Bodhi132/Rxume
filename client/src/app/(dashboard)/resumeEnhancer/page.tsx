@@ -2,6 +2,7 @@
 import React from 'react'
 import { useForm, SubmitHandler, useWatch, Controller } from "react-hook-form"
 import { useState, useEffect } from 'react'
+import TailoredResume from '@/app/components/TailoredResume'
 import { Dela_Gothic_One } from 'next/font/google'
 import { League_Gothic } from 'next/font/google'
 import { RiFileUploadFill } from "react-icons/ri";
@@ -28,6 +29,8 @@ const page = () => {
 
   const { register, handleSubmit, control, setValue } = useForm<Inputs>()
   const [isclicked, setClicked] = useState(false)
+  const [responseResume, setResponseResume] = useState(null)
+  const [loading, setIsLoading] = useState(false)
 
   const resume = useWatch({
     control,
@@ -42,25 +45,28 @@ const page = () => {
     console.log(resume)
   }, [resume])
 
-  const onSubmit: SubmitHandler<Inputs> = async(data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     // console.log(data.resume ? data.resume[0] : null)
-      const formData:any = new FormData()
-      formData.append('file', data.resume? data.resume[0] : null)
+    setIsLoading(true)
+    const formData: any = new FormData()
+    formData.append('file', data.resume ? data.resume[0] : null)
 
-      try{
-         const response = await axiosInstance.post('/resume-tailor', formData,{
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          params:{
-            job_url: data.jobLink,
-          }
-        })
-        console.log("Response:",response)
-      }
-      catch(err){
-        console.log(err)
-      }
+    try {
+      const response = await axiosInstance.post('/resume-tailor', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        params: {
+          job_url: data.jobLink,
+        }
+      })
+      console.log("Response:", response)
+      setResponseResume(response.data)
+      setIsLoading(false)
+    }
+    catch (err) {
+      console.log(err)
+    }
   }
 
   const handleRemoveFile = () => {
@@ -108,10 +114,11 @@ const page = () => {
           <option value="linkedin">LinkedIn</option>
           {/* <option value="internshala">Internshala</option> */}
         </select>
-        <input type="submit" className='mt-3 border-black personal-info-input p-2 rounded-md text-2xl bg-white cursor-pointer'/>
+        <input type="submit" className='mt-3 border-black personal-info-input p-2 rounded-md text-2xl bg-white cursor-pointer' />
       </form>
-
-      
+      {loading ? <p>Loading...</p> :
+        <TailoredResume responseResume={responseResume} />
+      }
     </div>
   )
 }

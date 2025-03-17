@@ -319,12 +319,13 @@ async def resume_tailor(job_url: str, file: UploadFile = File(...)):
     # OpenAI prompt to structure resume
     resume_prompt = f"""
     Extract and structure the following resume text into JSON format with these keys:
-    - Education
-    - Experience (company, role, duration, responsibilities)
-    - Skills (categorized by Frotend, Backend, Devops, Databases, etc.)
-    - Projects
-    - Links
-    - Achievements
+    - Personal_information (name, email, phone, github_link , linkedin_link , twitter_link, portfolio_link)
+    - education
+    - experience (company, role, duration, responsibilities, skills)
+    - technical_skills (categorized by Frotend, Backend, Devops, Databases, etc.)
+    - projects
+    - links
+    - achievements
     
     Resume Text:
     {text}
