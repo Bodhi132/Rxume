@@ -83,9 +83,9 @@ const page = () => {
       <button onClick={handleGoogleSignup} style={styles.oauthButton}>
         Sign Up with Google
       </button>
-      <button onClick={handleGithubSignup} style={styles.oauthButton}>
+      {/* <button onClick={handleGithubSignup} style={styles.oauthButton}>
         Sign Up with GitHub
-      </button>
+      </button> */}
     </div>
   );
 };

@@ -74,7 +74,7 @@ const page = () => {
   }
 
   return (
-    <div className={`bg-[#ECE8D9] w-full h-auto text-[#341210] px-[4rem] py-[2.5rem]`}>
+    <div className={`bg-[#ECE8D9] w-full h-auto overflow-y-auto text-[#341210] px-[4rem] py-[2.5rem]`}>
 
       <div className=' w-full flex flex-col items-center'>
         <p className={`${delaGothicOne.className} text-5xl`}>How it works ?</p>
@@ -116,9 +116,14 @@ const page = () => {
         </select>
         <input type="submit" className='mt-3 border-black personal-info-input p-2 rounded-md text-2xl bg-white cursor-pointer' />
       </form>
-      {loading ? <p>Loading...</p> :
-        <TailoredResume responseResume={responseResume} />
-      }
+      {/* {!responseResume ? (loading && <p>Loading...</p>) :
+        <div className='w-full h-[100vh]'>
+          <TailoredResume responseResume={responseResume} />
+        </div>
+      } */}
+      <div className='w-full h-full'>
+        <TailoredResume />
+      </div>
     </div>
   )
 }

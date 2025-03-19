@@ -322,10 +322,12 @@ async def resume_tailor(job_url: str, file: UploadFile = File(...)):
     - Personal_information (name, email, phone, github_link , linkedin_link , twitter_link, portfolio_link)
     - education
     - experience (company, role, duration, responsibilities, skills)
-    - technical_skills (categorized by Frotend, Backend, Devops, Databases, etc.)
+    - technical_skills (Frotend - (include all the languages , frameworks , libraries) , Backend - (include all the languages , frameworks , libraries), Devops, Databases, tools)
     - projects
     - links
     - achievements
+
+    Personal Information , Education , Experience , Technical Skills , Projects , Links , Achievements should be an array that could be mapped
     
     Resume Text:
     {text}
