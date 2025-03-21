@@ -33,10 +33,19 @@ const App: React.FC = () => {
   // useEffect(() => {
   //   setlocalFormData(window.localStorage.getItem('resumeForm') || {})
   // }, [])
+  const ISSERVER = typeof window === "undefined";
+
+  // useEffect(() => {
+  //   setOptmization(false)
+  // }, [localStorage.getItem("resumeForm")])
 
   useEffect(() => {
-    setOptmization(false)
-  }, [localStorage.getItem("resumeForm")])
+    if (typeof window !== "undefined") {
+      setOptmization(false);
+      // const resumeForm = localStorage.getItem("resumeForm");
+    }
+  }, []);
+  
 
 
   const getStoredFormData = (): FormData | undefined => {

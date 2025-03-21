@@ -116,14 +116,11 @@ const page = () => {
         </select>
         <input type="submit" className='mt-3 border-black personal-info-input p-2 rounded-md text-2xl bg-white cursor-pointer' />
       </form>
-      {/* {!responseResume ? (loading && <p>Loading...</p>) :
+      {!responseResume ? (loading && <p>Loading...</p>) :
         <div className='w-full h-[100vh]'>
           <TailoredResume responseResume={responseResume} />
         </div>
-      } */}
-      <div className='w-full h-full'>
-        <TailoredResume />
-      </div>
+      }
     </div>
   )
 }

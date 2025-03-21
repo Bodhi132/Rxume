@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { signIn , signOut } from 'next-auth/react';
 import axiosInstance from '../lib/axiosInstance';
+import Cookies from 'js-cookie';
 
 const page = () => {
 
@@ -27,19 +28,13 @@ const page = () => {
   const handleEmailSignup = async (e:React.FormEvent) => {
     e.preventDefault();
     try{
-      await axiosInstance.post('/register', userDetails,{
+      const response  = await axiosInstance.post('/register', userDetails,{
         headers: {
           'Content-Type': 'application/json',
         }
       })
-      const response  = await axiosInstance.post('/token', userDetails,{
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-      localStorage.setItem('token', response.data.access_token)
-      router.push('/resumebuilder')
-
+      Cookies.set('access_token', response.data.access_token,{expires: 1,secure:true})
+      router.push('http://localhost:3000/resumeBuilder')
     } catch (error) {
       console.error("Error during signup:", error);
     }

@@ -20,7 +20,9 @@ from fastapi.responses import RedirectResponse
 import json
 from scraper import scrape_linkedin_job_description
 from parser import extract_text_from_pdf
+from fastapi.responses import JSONResponse
 import re
+import uuid
 from openai import OpenAI
 
 load_dotenv()
@@ -78,10 +80,16 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     # Refresh the instance to get the updated state from the database
     db.refresh(new_user)
 
-    return {"msg": "User registered successfully", "user_id": new_user.id}
+    access_token = create_access_token(data={"sub": new_user.email})
+
+    user_id_str = str(new_user.id)
+
+    response = JSONResponse(content={"msg": "User registered and logged in successfully", "user_id": user_id_str,"access_token":access_token})
+
+    return response
 
 
-@app.post("/token")
+@app.post("/login")
 def login(userData: UserCreate, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == userData.email).first()
     if not user:
@@ -93,7 +101,11 @@ def login(userData: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password"
         )
     access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+
+    response = JSONResponse(content={"msg": "Login successful", "user_id": user.id,"access_token":access_token})
+
+    return response
+
 
 
 @app.get("/auth/login/google")
@@ -120,7 +132,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         )
         print("ID info:", idinfo)
         user_data = User(
-            id=idinfo["sub"],
+            id=uuid.UUID(idinfo["sub"]),
             name=idinfo["name"],
             email=idinfo["email"],
             img=idinfo["picture"],
@@ -137,7 +149,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
             db.commit()
             db.refresh(user)
 
-        access_token = create_access_token(data={"sub": user_data.id})
+        access_token = create_access_token(data={"sub": str(user_data.id)})
         response = RedirectResponse(url="http://localhost:3000/resumeBuilder")
         response.set_cookie(key="access_token", value=access_token, httponly=True)
         return response
@@ -147,78 +159,78 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/auth/login/github")
-async def github_login(request: Request):
-    return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={settings.AUTH_GITHUB_CLIENT_ID}&status_code=302"
-    )
+# @app.get("/auth/login/github")
+# async def github_login(request: Request):
+#     return RedirectResponse(
+#         f"https://github.com/login/oauth/authorize?client_id={settings.AUTH_GITHUB_CLIENT_ID}&status_code=302"
+#     )
 
 
-@app.get("/api/auth/callback/github")
-async def github_code(code: str, db: Session = Depends(get_db)):
-    try:
-        if not inspect(engine).has_table("users"):
-            Base.metadata.create_all(bind=engine)
+# @app.get("/api/auth/callback/github")
+# async def github_code(code: str, db: Session = Depends(get_db)):
+#     try:
+#         if not inspect(engine).has_table("users"):
+#             Base.metadata.create_all(bind=engine)
 
-        params = {
-            "client_id": settings.AUTH_GITHUB_CLIENT_ID,
-            "client_secret": settings.AUTH_GITHUB_CLIENT_SECRET,
-            "code": code,
-        }
-        headers = {"Accept": "application/json"}
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                url="https://github.com/login/oauth/access_token",
-                params=params,
-                headers=headers,
-            )
-            response_json = response.json()
-            print(response_json)
-            access_token = response_json["access_token"]
-            headers.update({"Authorization": f"token {access_token}"})
+#         params = {
+#             "client_id": settings.AUTH_GITHUB_CLIENT_ID,
+#             "client_secret": settings.AUTH_GITHUB_CLIENT_SECRET,
+#             "code": code,
+#         }
+#         headers = {"Accept": "application/json"}
+#         async with httpx.AsyncClient() as client:
+#             response = await client.post(
+#                 url="https://github.com/login/oauth/access_token",
+#                 params=params,
+#                 headers=headers,
+#             )
+#             response_json = response.json()
+#             print(response_json)
+#             access_token = response_json["access_token"]
+#             headers.update({"Authorization": f"token {access_token}"})
 
-            # Fetch user profile
-            response = await client.get(
-                url="https://api.github.com/user", headers=headers
-            )
-            user_profile = response.json()
-            print(user_profile)
+#             # Fetch user profile
+#             response = await client.get(
+#                 url="https://api.github.com/user", headers=headers
+#             )
+#             user_profile = response.json()
+#             print(user_profile)
 
-            # Fetch user emails
-            response = await client.get(
-                url="https://api.github.com/user/emails", headers=headers
-            )
-            emails = response.json()
-            print(emails)
+#             # Fetch user emails
+#             response = await client.get(
+#                 url="https://api.github.com/user/emails", headers=headers
+#             )
+#             emails = response.json()
+#             print(emails)
 
-            primary_email = next(email["email"] for email in emails if email["primary"])
+#             primary_email = next(email["email"] for email in emails if email["primary"])
 
-            user_data = User(
-                id=str(user_profile["id"]),
-                name=user_profile["name"],
-                email=primary_email,
-                img=user_profile["avatar_url"],
-            )
-            user = db.query(User).filter(User.id == user_data.id).first()
-            if not user:
-                db.add(user_data)
-                db.commit()
-                db.refresh(user_data)
-            else:
-                user.name = user_data.name
-                user.email = user_data.email
-                user.img = user_data.img
-                db.commit()
-                db.refresh(user)
+#             user_data = User(
+#                 id=str(user_profile["id"]),
+#                 name=user_profile["name"],
+#                 email=primary_email,
+#                 img=user_profile["avatar_url"],
+#             )
+#             user = db.query(User).filter(User.id == user_data.id).first()
+#             if not user:
+#                 db.add(user_data)
+#                 db.commit()
+#                 db.refresh(user_data)
+#             else:
+#                 user.name = user_data.name
+#                 user.email = user_data.email
+#                 user.img = user_data.img
+#                 db.commit()
+#                 db.refresh(user)
 
-            access_token = create_access_token(data={"sub": user_data.id})
-            response = RedirectResponse(url="http://localhost:3000/resumeBuilder")
-            response.set_cookie(key="access_token", value=access_token, httponly=True)
-            return response
-    except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#             access_token = create_access_token(data={"sub": user_data.id})
+#             response = RedirectResponse(url="http://localhost:3000/resumeBuilder")
+#             response.set_cookie(key="access_token", value=access_token, httponly=True)
+#             return response
+#     except ValueError:
+#         raise HTTPException(status_code=401, detail="Invalid token")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
