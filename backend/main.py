@@ -82,9 +82,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     access_token = create_access_token(data={"sub": new_user.email})
 
-    user_id_str = str(new_user.id)
-
-    response = JSONResponse(content={"msg": "User registered and logged in successfully", "user_id": user_id_str,"access_token":access_token})
+    response = JSONResponse(content={"msg": "User registered and logged in successfully", "user_id": new_user.id,"access_token":access_token})
 
     return response
 
@@ -132,7 +130,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         )
         print("ID info:", idinfo)
         user_data = User(
-            id=uuid.UUID(idinfo["sub"]),
+            id=idinfo["sub"],
             name=idinfo["name"],
             email=idinfo["email"],
             img=idinfo["picture"],
@@ -152,6 +150,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         access_token = create_access_token(data={"sub": str(user_data.id)})
         response = RedirectResponse(url="http://localhost:3000/resumeBuilder")
         response.set_cookie(key="access_token", value=access_token, httponly=True)
+        response.set_cookie(key="user_id", value=str(user_data.id), httponly=True)
         return response
     except ValueError:
         raise HTTPException(status_code=401, detail="Invalid token")

@@ -8,12 +8,12 @@ const layout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
       <div className='flex w-screen h-auto'>
         <Sidebar />
         {children}
       </div>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   )
 }
 
