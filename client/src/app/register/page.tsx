@@ -34,6 +34,7 @@ const page = () => {
         }
       })
       Cookies.set('access_token', response.data.access_token,{expires: 1,secure:true})
+      Cookies.set('user_id', response.data.user_id,{expires: 1,secure:true})
       router.push('http://localhost:3000/resumeBuilder')
     } catch (error) {
       console.error("Error during signup:", error);

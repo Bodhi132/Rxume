@@ -121,6 +121,10 @@ const page = () => {
           <TailoredResume responseResume={responseResume} />
         </div>
       }
+
+      <div>
+        
+      </div>
     </div>
   )
 }

@@ -34,7 +34,6 @@ class PDFDocument(Base):
         unique=True,
         index=True,
     )
-    filename = Column(String, nullable=True)
     json_data = Column(JSONB)
     user_id = Column(String, ForeignKey("users.id"))
 
