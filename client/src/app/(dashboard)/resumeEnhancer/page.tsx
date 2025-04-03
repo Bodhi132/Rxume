@@ -6,6 +6,7 @@ import TailoredResume from '@/app/components/TailoredResume'
 import { Dela_Gothic_One } from 'next/font/google'
 import { League_Gothic } from 'next/font/google'
 import { RiFileUploadFill } from "react-icons/ri";
+import Cookies from 'js-cookie';
 import axiosInstance from '@/app/lib/axiosInstance'
 import './styles.css'
 
@@ -29,7 +30,7 @@ const page = () => {
 
   const { register, handleSubmit, control, setValue } = useForm<Inputs>()
   const [isclicked, setClicked] = useState(false)
-  const [responseResume, setResponseResume] = useState(null)
+  const [responseResume, setResponseResume] = useState<{ tailored_resume: any } | null>(null)
   const [loading, setIsLoading] = useState(false)
 
   const resume = useWatch({
@@ -60,7 +61,7 @@ const page = () => {
           job_url: data.jobLink,
         }
       })
-      console.log("Response:", response)
+      console.log(response)
       setResponseResume(response.data)
       setIsLoading(false)
     }
@@ -71,6 +72,40 @@ const page = () => {
 
   const handleRemoveFile = () => {
     setValue('resume', null)
+  }
+
+  const handleResumeUpload = async() => {
+
+    if (!responseResume) {
+      alert('Please upload your resume first');
+      return;
+    }
+    if(Cookies.get('user_id')===undefined || Cookies.get('user_id')===null){
+      alert('Please login first');
+      return;
+    }
+    const user_id = Cookies.get('user_id') as string
+
+    const resume = responseResume.tailored_resume;
+
+    console.log(resume);
+    
+
+    try {
+      const response = await axiosInstance.post('/upload-resume', {
+        json_data: responseResume.tailored_resume,
+      },
+    {
+      params: {
+        user_id: user_id,
+      }
+    });
+      alert('Resume uploaded successfully');
+      console.log(response);
+    } catch (error) {
+      console.error('Error uploading resume:', error);
+      alert('Failed to upload the resume. Please try again.');
+    }
   }
 
   return (
@@ -122,8 +157,8 @@ const page = () => {
         </div>
       }
 
-      <div>
-        
+      <div className='w-full flex justify-center'>
+        <button className={`mt-3 border-black personal-info-input px-8 py-2 rounded-md text-2xl bg-white ${league_Gothic.className}`} onClick={handleResumeUpload}>Save</button>
       </div>
     </div>
   )

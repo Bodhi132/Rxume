@@ -5,7 +5,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from models import User, Base , PDFDocument
+from models import User, Base , Resume
 from database import engine, get_db
 from auth import create_access_token
 from fastapi.middleware.cors import CORSMiddleware
@@ -413,7 +413,7 @@ async def resume_tailor(job_url: str, file: UploadFile = File(...)):
     
     return {"tailored_resume": tailored_resume}
 
-@app.post("/pdf-documents",response_model=dict)
+@app.post("/upload-resume",response_model=dict)
 async def create_pdf_document(
     user_id: str,
     json_data: dict,
@@ -423,7 +423,7 @@ async def create_pdf_document(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    pdf_document = PDFDocument(
+    pdf_document = Resume(
         json_data = json_data,
         user_id = user_id
     )

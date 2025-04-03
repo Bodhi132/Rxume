@@ -1,173 +1,242 @@
 import React from 'react'
-import { PDFViewer, Font } from '@react-pdf/renderer';
-import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, } from "@react-pdf/renderer";
-import PdfViewer from './PdfViewer';
+import { PDFViewer } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Link } from "@react-pdf/renderer";
 
 interface TailoredResumeProps {
-    responseResume: any; // Replace 'any' with the appropriate type if known
+    responseResume: any;
 }
 
 const styles = StyleSheet.create({
     page: {
         flexDirection: "column",
-        paddingHorizontal: '20px',
-        paddingVertical: '8px'
+        padding: 20,
+        fontFamily: 'Helvetica'
+    },
+    header: {
+        flexDirection: "column",
+        alignItems: "center",
+        marginBottom: 10,
+        borderBottom: '1 solid #e0e0e0',
+        paddingBottom: 10
+    },
+    name: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5
+    },
+    contactInfo: {
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 5,
+        fontSize: 10,
+        flexWrap: 'wrap'
     },
     section: {
-        marginBottom: '10px'
+        marginBottom: 10
     },
-    title: {
-        fontSize: '13px',
-        fontFamily: 'Helvetica-Bold',
-        marginBottom: '5px'
+    sectionTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        borderBottom: '1 solid #e0e0e0',
+        paddingBottom: 3
     },
-    text: {
-        fontSize: '11px',
-        marginBottom: '5px'
+    item: {
+        marginBottom: 8
     },
-    link: {
+    itemHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 3
+    },
+    company: {
+        fontSize: 12,
+        fontWeight: 'bold'
+    },
+    duration: {
+        fontSize: 10,
+        color: '#555'
+    },
+    role: {
+        fontSize: 10,
+        fontStyle: 'italic',
+        marginBottom: 3
+    },
+    skills: {
+        fontSize: 9,
+        color: '#555',
+        marginBottom: 3
+    },
+    bulletPoint: {
+        fontSize: 10,
+        marginLeft: 10,
+        marginBottom: 2
+    },
+    educationItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 5
+    },
+    institution: {
+        fontSize: 11,
+        fontWeight: 'bold'
+    },
+    degree: {
+        fontSize: 10
+    },
+    grade: {
+        fontSize: 10
+    },
+    projectTitle: {
+        fontSize: 11,
+        fontWeight: 'bold',
+        marginBottom: 2
+    },
+    projectTech: {
+        fontSize: 9,
+        color: '#555',
+        marginBottom: 3
+    },
+    projectDesc: {
+        fontSize: 10,
+        marginBottom: 5
+    },
+    projectFeatures: {
+        fontSize: 9,
+        marginLeft: 10,
+        marginBottom: 2
+    },
+    skillCategory: {
+        flexDirection: 'row',
+        marginBottom: 3
+    },
+    skillCategoryName: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        width: 80
+    },
+    skillList: {
+        fontSize: 10,
+        flex: 1
+    },
+    linkItem: {
+        fontSize: 10,
         color: 'blue',
-        textDecoration: 'none'
+        textDecoration: 'none',
+        marginBottom: 2
     }
 });
 
-
 const TailoredResume: React.FC<TailoredResumeProps> = ({ responseResume }) => {
+    const data = responseResume?.tailored_resume || {};
+    const personalInfo = data.Personal_information?.[0] || {};
+    const technicalSkills = data.technical_skills || {};
+    
     return (
         <div className='w-full h-full'>
-            <PDFViewer width="80%" height="85%">
+            <PDFViewer width="100%" height="100%">
                 <Document>
-                    <Page size="A4" style={{ flexDirection: "column", paddingHorizontal: '20px', paddingVertical: '8px' }}>
-                        {/* Personal Information Section */}
-                        <View >
-                            <View style={{ flexDirection: "row", justifyContent: "center", gap: 10 }}>
-                                <Text style={{ fontSize: '16px', fontWeight: 'bold', }}>{responseResume?.tailored_resume.Personal_information[0].name}</Text>
-                            </View>
-                            <View style={{ flexDirection: "row", justifyContent: "center", gap: '5px', paddingVertical: '3px', fontSize: '8px' }}>
-                                <Text>{responseResume?.tailored_resume.Personal_information[0].phone}</Text>
-                                <Text>|</Text>
-                                <Link src={`mailto:${responseResume?.tailored_resume.Personal_information[0].email}`} style={styles.link}>
-                                    <Text>Email</Text>
+                    <Page size="A4" style={styles.page}>
+                        {/* Header */}
+                        <View style={styles.header}>
+                            <Text style={styles.name}>{personalInfo.name || 'Your Name'}</Text>
+                            <View style={styles.contactInfo}>
+                                <Text>{personalInfo.phone || ''}</Text>
+                                {personalInfo.phone && <Text>|</Text>}
+                                <Link src={`mailto:${personalInfo.email || ''}`} style={styles.linkItem}>
+                                    <Text>{personalInfo.email || ''}</Text>
                                 </Link>
-                                <Text>|</Text>
-                                <Link src={responseResume?.tailored_resume.Personal_information[0].github_link} style={styles.link}>
+                                {personalInfo.email && <Text>|</Text>}
+                                <Link src={personalInfo.github_link || ''} style={styles.linkItem}>
                                     <Text>GitHub</Text>
                                 </Link>
                                 <Text>|</Text>
-                                <Link src={responseResume?.tailored_resume.Personal_information[0].linkedin_link} style={styles.link}>
+                                <Link src={personalInfo.linkedin_link || ''} style={styles.linkItem}>
                                     <Text>LinkedIn</Text>
                                 </Link>
-                                {responseResume?.tailored_resume.Personal_information[0].portfolio_link && (
+                                {personalInfo.portfolio_link && (
                                     <>
                                         <Text>|</Text>
-                                        <Text>{responseResume?.tailored_resume.Personal_information[0].portfolio_link}</Text>
+                                        <Text>{personalInfo.portfolio_link}</Text>
                                     </>
                                 )}
                             </View>
                         </View>
 
-                        {/* Education Section */}
-                        <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '5px', marginLeft: '15px', marginBottom: '6px' }}>EDUCATION :</Text>
-                        {responseResume?.tailored_resume.education.map((edu: any, index: number) => (
-                            // <View key={index} style={styles.text}>
-                            //     <Text>{edu.institution}</Text>
-                            //     <Text>{edu.degree}</Text>
-                            //     {edu.cgpa && <Text>CGPA: {edu.cgpa}</Text>}
-                            //     <Text>{edu.duration}</Text>
-                            // </View>
-                            <View key={index} style={{ marginBottom: '6px', marginLeft: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '10px' }}>
-                                    <Text>{edu.institution}</Text>
-                                    <Text>|</Text>
-                                    <Text>{edu.degree}</Text>
-                                    {edu.cgpa > 0 &&
-                                        <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                                            <Text>{'('}</Text>
-                                            <Text>{edu.cgpa}</Text>
-                                            <Text>CGPA</Text>
-                                            <Text>{')'}</Text>
-                                        </View>
-                                    }
+                        {/* Education */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>EDUCATION</Text>
+                            {data.education?.map((edu: any, index: number) => (
+                                <View key={index} style={styles.educationItem}>
+                                    <View>
+                                        <Text style={styles.institution}>{edu.institution}</Text>
+                                        <Text style={styles.degree}>{edu.degree}</Text>
+                                    </View>
+                                    <View style={{alignItems: 'flex-end'}}>
+                                        <Text style={styles.duration}>{edu.duration}</Text>
+                                        {edu.cgpa && <Text style={styles.grade}>CGPA: {edu.cgpa}</Text>}
+                                    </View>
                                 </View>
-                                <Text style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '10px' }}>{edu.duration}</Text>
-                            </View>
-                        ))}
+                            ))}
+                        </View>
 
-                        {/* Experience Section */}
-                        <View>
-                            <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '10px', marginLeft: '15px', marginBottom: '4px' }}>EXPERIENCE :</Text>
-                            {responseResume?.tailored_resume.experience.map((exp: any, index: number) => (
-                                <View key={index} style={{ marginLeft: '15px', flexDirection: 'column', gap: '4px', fontSize: '10px' }}>
-                                    <Text>{exp.role} - {exp.company}</Text>
-                                    <Text>{exp.duration}</Text>
-                                    <Text>Skills: {exp.skills.join(', ')}</Text>
-                                    {exp.responsibilities.map((resp: string, i: number) => (
-                                        <Text key={i}>{'\u2022'} {resp}</Text>
+                        {/* Experience */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>EXPERIENCE</Text>
+                            {data.experience?.map((exp: any, index: number) => (
+                                <View key={index} style={styles.item}>
+                                    <View style={styles.itemHeader}>
+                                        <Text style={styles.company}>{exp.company}</Text>
+                                        <Text style={styles.duration}>{exp.duration}</Text>
+                                    </View>
+                                    <Text style={styles.role}>{exp.role}</Text>
+                                    <Text style={styles.skills}>Skills: {exp.skills?.join(', ')}</Text>
+                                    {exp.responsibilities?.map((resp: string, i: number) => (
+                                        <Text key={i} style={styles.bulletPoint}>• {resp}</Text>
                                     ))}
                                 </View>
                             ))}
                         </View>
 
-                        {/* Technical Skills Section */}
-                        {/* <View style={styles.section}>
-                            <Text style={styles.title}>TECHNICAL SKILLS</Text>
-                            <Text style={styles.text}>Languages: {responseResume?.tailored_resume.technical_skills.Languages.join(', ')}</Text>
-                            <Text style={styles.text}>Web Development: {responseResume?.tailored_resume.technical_skills["Web Development"].join(', ')}</Text>
-                            <Text style={styles.text}>Technology: {responseResume?.tailored_resume.technical_skills.Technology.join(', ')}</Text>
-                        </View> */}
-
-                        {/* <View style={{ marginTop: '2px', paddingBottom: '5px', paddingTop: '2px', flexDirection: 'column', gap: '5px', fontSize: '11px' }}>
-                            <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginVertical: '5px', marginLeft: '15px', marginBottom: '4px' }}>
-                                TECHNICAL SKILLS :
-                            </Text>
-                            <View style={{ marginLeft: '15px', flexDirection: 'column', gap: '4px', }}>
-                                {
-                                    Object.entries(responseResume?.tailored_resume.technical_skills).map(([key, value], index) => (
-                                        <View key={index} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                                            <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>{`${key} - `}</Text>
-                                            <Text>{(value as string[]).join(', ')}</Text>
-                                        </View>
-                                    ))
-                                }
-                            </View>
-                        </View> */}
-                        <View style={{ marginTop: '2px', paddingBottom: '5px', paddingTop: '2px', flexDirection: 'column', gap: '5px', fontSize: '11px' }}>
-                            <Text  style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginVertical: '5px', marginLeft: '15px', marginBottom: '4px' }}>TECHNICAL SKILLS:</Text>
-                            <View >
-                                {responseResume?.tailored_resume.technical_skills.map((skillCategory:any, index:number) => (
-                                    <View key={index} style={{ marginLeft: '15px', flexDirection: 'column', gap: '4px', }}>
-                                        {Object.entries(skillCategory).map(([key, value], idx) => (
-                                            <View key={idx} style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
-                                                <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>{`${key}: `}</Text>
-                                                <Text>{(value as string[]).join(', ')}</Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
-
-                        {/* Projects Section */}
-                        <View style={{ marginTop: '2px', marginLeft: '15px', paddingBottom: '5px', paddingTop: '2px', flexDirection: 'column', gap: '5px', fontSize: '11px' }}>
-                            <Text style={styles.title}>PROJECTS</Text>
-                            {responseResume?.tailored_resume.projects.map((proj: any, index: number) => (
-                                <View key={index} style={styles.text}>
-                                    <Text>{proj.name}</Text>
-                                    <Text>Technologies: {proj.technologies.join(', ')}</Text>
-                                    <Text>{proj.description}</Text>
+                        {/* Technical Skills */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>TECHNICAL SKILLS</Text>
+                            {technicalSkills && Object.entries(technicalSkills).map(([category, skills]: [string, any], index) => (
+                                <View key={index} style={styles.skillCategory}>
+                                    <Text style={styles.skillCategoryName}>{category}:</Text>
+                                    <Text style={styles.skillList}>
+                                        {Array.isArray(skills) ? skills.join(', ') : ''}
+                                    </Text>
                                 </View>
                             ))}
                         </View>
 
-                        {/* Links Section */}
-                        <View style={{ marginTop: '2px', marginLeft: '15px', paddingBottom: '5px', paddingTop: '2px', flexDirection: 'column', gap: '5px', fontSize: '11px' }}>
-                            <Text style={styles.title}>LINKS</Text>
-                            {responseResume?.tailored_resume.links.map((link: string, index: number) => (
-                                <Link key={index} src={link} style={styles.link}>
-                                    <Text>{link}</Text>
-                                </Link>
+                        {/* Projects */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>PROJECTS</Text>
+                            {data.projects?.map((proj: any, index: number) => (
+                                <View key={index} style={styles.item}>
+                                    <Text style={styles.projectTitle}>{proj.name}</Text>
+                                    <Text style={styles.projectTech}>Technologies: {proj.technologies?.join(', ')}</Text>
+                                    <Text style={styles.projectDesc}>{proj.description}</Text>
+                                    {proj.features?.map((feature: string, i: number) => (
+                                        <Text key={i} style={styles.projectFeatures}>• {feature}</Text>
+                                    ))}
+                                </View>
                             ))}
                         </View>
+
+                        {/* Links */}
+                        {data.links && data.links.length > 0 && (
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>LINKS</Text>
+                                {Object.entries(data.links[0]).map(([name, url]: [string, any], index: number) => (
+                                    <Link key={index} src={url} style={styles.linkItem}>
+                                        <Text>{name}: {url}</Text>
+                                    </Link>
+                                ))}
+                            </View>
+                        )}
                     </Page>
                 </Document>
             </PDFViewer>
@@ -175,4 +244,4 @@ const TailoredResume: React.FC<TailoredResumeProps> = ({ responseResume }) => {
     );
 }
 
-export default TailoredResume
+export default TailoredResume;

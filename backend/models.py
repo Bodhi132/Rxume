@@ -1,6 +1,6 @@
 import uuid
-from sqlalchemy import Column, String, Integer, LargeBinary, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -22,11 +22,11 @@ class User(Base):
     img = Column(String, nullable=True)
 
     # Use string reference for forward declaration
-    pdf_documents = relationship("PDFDocument", back_populates="user")
+    resumes = relationship("Resume", back_populates="user")
 
 
-class PDFDocument(Base):
-    __tablename__ = "pdf_documents"
+class Resume(Base):
+    __tablename__ = "resume"
     id = Column(
         String,
         primary_key=True,
@@ -38,4 +38,4 @@ class PDFDocument(Base):
     user_id = Column(String, ForeignKey("users.id"))
 
     # Use string reference for forward declaration
-    user = relationship("User", back_populates="pdf_documents")
+    user = relationship("User", back_populates="resumes")
