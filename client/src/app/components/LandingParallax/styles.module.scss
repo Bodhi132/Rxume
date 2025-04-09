@@ -1,0 +1,63 @@
+.container{
+  height: 300vh;
+  position: relative;
+  .sticky{
+      position: sticky;
+      overflow: hidden;
+      top: 0;
+      height: 100vh;
+
+      .el{
+          width: 100%;
+          height: 100%;
+          top: 0;
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .sectionContainer{
+              position: relative;
+              width: 25vw;
+              height: 25vh;
+              .section {
+                  position: absolute;
+                  z-index: 10; // Ensure it appears above the image
+                  font-size: 40px;
+                  width: 100%; // Ensure it spans the container
+                  height: 100%; // Ensure it spans the container
+              }
+          }
+          &:nth-of-type(2){
+            .sectionContainer{
+                top: -30vh;
+                left: 5vw;
+                width: 35vw;
+                height: 30vh;
+            }
+        }
+        &:nth-of-type(3){
+            .sectionContainer{
+                top: -10vh;
+                left: -25vw;
+                width: 20vw;
+                height: 45vh;
+            }
+        }
+        &:nth-of-type(4){
+            .sectionContainer{
+                left: 27.5vw;
+                width: 25vw;
+                height: 25vh;
+            }
+        }
+        &:nth-of-type(5){
+            .sectionContainer{
+                top: 27.5vh;
+                left: 5vw;
+                width: 20vw;
+                height: 25vh;
+            }
+        }
+      }
+  }
+}
