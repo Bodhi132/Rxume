@@ -52,7 +52,7 @@ export default function Index() {
       <div className={styles.sticky}>
         {
           sections.map(({ component, scale }, index) => {
-            return <motion.div key={index} style={{ scale }} className={styles.el}>
+            return <motion.div key={index} style={{ scale,zIndex:index?0:600 }} className={styles.el}>
               <div className={styles.sectionContainer}>
                 <div className={styles.section}>
                   {component}
