@@ -1,7 +1,7 @@
 import Features from "./sections/Features";
 import Headlines from "./sections/Headlines";
 import Hero from "./sections/Hero";
-import Login from "./sections/Login";
+import Login from "./sections/Tech";
 import Main from "./sections/Main";
 
 import { useTransform } from 'framer-motion';

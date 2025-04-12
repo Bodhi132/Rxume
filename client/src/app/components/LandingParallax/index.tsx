@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import Features from '../landingPageComponents/sections/Features';
 import Headlines from '../landingPageComponents/sections/Headlines';
 import Hero from '../landingPageComponents/sections/Hero';
-import Login from '../landingPageComponents/sections/Login';
+import Tech from '../landingPageComponents/sections/Tech';
 import Main from '../landingPageComponents/sections/Main';
 
 export default function Index() {
@@ -42,7 +42,7 @@ export default function Index() {
       scale: scale8
     },
     {
-      component: <Login />,
+      component: <Tech />,
       scale: scale9
     },
   ]

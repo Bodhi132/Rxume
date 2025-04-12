@@ -3,6 +3,7 @@ import styles from './page.module.scss'
 import Index from './components/LandingParallax';
 import { MdKeyboardDoubleArrowDown } from "react-icons/md";
 import Image from 'next/image';
+import Footer from './components/Footer';
 
 export default function Home() {
 
@@ -22,6 +23,7 @@ export default function Home() {
       <main className={styles.main}>
         <Index />
       </main>
+      <Footer/>
     </div>
   );
 }
