@@ -1,7 +1,9 @@
+"use client";
 import React from "react";
 import { FaArrowRight, FaPlayCircle, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaGithub } from "react-icons/fa";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const Footer = () => {
   const container = {
@@ -18,6 +20,8 @@ const Footer = () => {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
+
+  const router = useRouter();
 
   return (
     <footer className="min-h-screen bg-[#1A1F2C] text-white py-16 relative overflow-hidden">
@@ -54,6 +58,7 @@ const Footer = () => {
           <motion.div variants={item} className="mb-16">
             <button 
               className="px-8 py-7 text-xl font-bold uppercase bg-[#ffeb3b] hover:bg-[#e6d535] text-black border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,0.8)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,0.8)] hover:translate-y-1 hover:translate-x-1 transition-all duration-200 group" 
+              onClick={()=> router.push("/register")}
             >
               Get Started Now!
               <FaArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform duration-300" />
