@@ -31,9 +31,9 @@ const Sidebar = () => {
                         </Link>
                     </li>
                     <li className=' py-4'>
-                        <Link href='/Analytics' className='flex gap-4'>
+                        <Link href='/resumes' className='flex gap-4'>
                             <SiGoogleanalytics className=' text-2xl opacity-70' />
-                            <p className={`${pathname === '/Analytics'?'font-bold':'' }`}>Analytics</p>
+                            <p className={`${pathname === '/resumes'?'font-bold':'' }`}>Resumes</p>
                         </Link>
                     </li>
                 </ul>

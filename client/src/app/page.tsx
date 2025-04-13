@@ -8,22 +8,28 @@ import Footer from './components/Footer';
 export default function Home() {
 
   return (
-    <div className=' bg-white scroll-smooth'>
-      <div className='flex flex-col justify-center items-center'>
-        <Image src="/images/rxume-logo.png" alt="Rxume Logo" width={500} height={500} />
-        <div className='flex flex-col justify-center items-center gap-4'>
-          <h1 className='text-8xl font-bold'>Build Smarter Resumes</h1>
-          <h1 className='text-5xl font-bold opacity-75'>Tailored for Every Job</h1>
-          <div className='flex flex-col justify-center items-center mt-9'>
-            <h1 className='text-xl font-bold opacity-75'>Get started now</h1>
-              <MdKeyboardDoubleArrowDown className='text-4xl animate-bounce mt-6' />
+    <div className="min-h-screen bg-yellow-100 bg-[radial-gradient(#444_1px,transparent_1px)] bg-[length:10px_10px]">
+      <div className="flex flex-col justify-center items-center p-10 font-comic">
+        <Image src="/images/rxume-logo.png" alt="Rxume Logo" width={300} height={300} />
+
+        <div className="text-center mt-8 space-y-6">
+          <h1 className="text-6xl md:text-8xl text-red-600 font-bold drop-shadow-[3px_3px_0_#000] skew-y-1">
+            Build Smarter Resumes
+          </h1>
+          <h2 className="text-4xl md:text-5xl text-black font-bold opacity-80 drop-shadow-[2px_2px_0_#000] -rotate-1">
+            Tailored for Every Job
+          </h2>
+
+          <div className="mt-12 flex flex-col items-center gap-3">
+            <h3 className="text-xl md:text-2xl font-bold opacity-80 text-black drop-shadow-[1px_1px_0_#000]">Get started now</h3>
+            <MdKeyboardDoubleArrowDown className="text-5xl text-black animate-bounce" />
           </div>
         </div>
       </div>
       <main className={styles.main}>
         <Index />
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

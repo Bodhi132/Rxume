@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import List
+from typing import List,Any
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -11,3 +11,10 @@ class UserLogin(BaseModel):
 
 class TextOptimizationRequest(BaseModel):
     texts: List[str]
+
+class ResumeSchema(BaseModel):
+    id: str
+    json_data: Any  # Use `Any` if `json_data` is a dictionary or nested JSON
+
+    class Config:
+        orm_mode = True

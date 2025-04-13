@@ -18,6 +18,8 @@ from core.config import settings
 import httpx
 from fastapi.responses import RedirectResponse
 import json
+from typing import List
+from schemas import ResumeSchema
 from scraper import scrape_linkedin_job_description
 from parser import extract_text_from_pdf
 from fastapi.responses import JSONResponse
@@ -433,3 +435,16 @@ async def create_pdf_document(
     db.refresh(pdf_document)
 
     return {"id": pdf_document.id, "json_data": pdf_document.json_data}
+
+@app.get('/get-all-resumes',response_model=list[ResumeSchema])
+async def get_all_resumes(
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    resumes = db.query(Resume).filter(Resume.user_id == user_id).all()
+
+    return resumes
