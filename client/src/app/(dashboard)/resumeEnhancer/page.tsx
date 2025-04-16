@@ -20,7 +20,7 @@ const league_Gothic = League_Gothic({
   weight: "400",
 })
 
-const page = () => {
+const Page = () => {
 
   type Inputs = {
     jobLink: string,
@@ -164,4 +164,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

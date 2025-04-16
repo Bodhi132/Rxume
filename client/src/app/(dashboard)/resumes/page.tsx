@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import axiosInstance from '@/app/lib/axiosInstance'
 import Cookies from 'js-cookie'
 
-const page = () => {
+const Page = () => {
 
   type Resume = {
     id: number
@@ -60,4 +60,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
