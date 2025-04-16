@@ -109,11 +109,14 @@ const App: React.FC = () => {
     }
   });
 
+  const watchedValues = useWatch({ control });
+
   useFormPersist('resumeForm', {
-    watch: (names) => useWatch({ control, name: names as any }),
+    watch: () => watchedValues,
     setValue,
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
   });
+  
 
   // useEffect(() => {
   //   const localData = localStorage.getItem('resumeForm');
