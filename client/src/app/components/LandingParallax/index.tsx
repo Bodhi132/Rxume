@@ -1,5 +1,4 @@
 import styles from './styles.module.scss';
-import getSections from '../landingPageComponents/sectionsData';// Import the pictures function
 import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRef } from 'react';
 
@@ -23,7 +22,6 @@ export default function Index() {
   const scale8 = useTransform(scrollYProgress, [0, 1], [1, 8]);
   const scale9 = useTransform(scrollYProgress, [0, 1], [1, 9]);
 
-  // const sections = getSections(scrollYProgress);
   const sections = [
     {
       component: <Main />,
