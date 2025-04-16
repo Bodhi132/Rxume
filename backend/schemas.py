@@ -17,4 +17,4 @@ class ResumeSchema(BaseModel):
     json_data: Any  # Use `Any` if `json_data` is a dictionary or nested JSON
 
     class Config:
-        orm_mode = True
+        from_attributes = True
