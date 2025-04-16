@@ -5,7 +5,7 @@ import axiosInstance from '../lib/axiosInstance';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
 
-const page = () => {
+const Page = () => {
   const [userDetails, setuserDetails] = useState({ email: "", password: "" });
   const router = useRouter();
 
@@ -181,4 +181,4 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-export default page;
+export default Page;
