@@ -28,14 +28,14 @@ const Page = () => {
         expires: 1,
         secure: true,
       });
-      router.push("http://localhost:3000/resumeBuilder");
+      router.push("https://rxume.vercel.app/resumeBuilder");
     } catch (error) {
       console.error("Error during sign in:", error);
     }
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "http://localhost:8000/auth/login/google";
+    window.location.href = "https://rxume.vercel.app/auth/login/google";
   };
 
   return (

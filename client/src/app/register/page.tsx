@@ -22,14 +22,14 @@ const Page = () => {
       });
       Cookies.set('access_token', response.data.access_token, { expires: 1, secure: true });
       Cookies.set('user_id', response.data.user_id, { expires: 1, secure: true });
-      router.push('http://localhost:3000/resumeBuilder');
+      router.push('https://rxume.vercel.app/resumeBuilder');
     } catch (error) {
       console.error("Error during signup:", error);
     }
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = 'http://localhost:8000/auth/login/google';
+    window.location.href = 'https://rxume.vercel.app/auth/login/google';
   };
 
   return (
