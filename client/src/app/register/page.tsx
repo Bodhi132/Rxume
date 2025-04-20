@@ -22,14 +22,14 @@ const Page = () => {
       });
       Cookies.set('access_token', response.data.access_token, { expires: 1, secure: true });
       Cookies.set('user_id', response.data.user_id, { expires: 1, secure: true });
-      router.push('https://rxume.vercel.app/resumeBuilder');
+      router.push('https://rxume-7eyw-qmzki54d4-bodhi132s-projects.vercel.app/resumeBuilder');
     } catch (error) {
       console.error("Error during signup:", error);
     }
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = 'https://rxume.vercel.app/auth/login/google';
+    window.location.href = 'https://rxume-7eyw-qmzki54d4-bodhi132s-projects.vercel.app/auth/login/google';
   };
 
   return (
