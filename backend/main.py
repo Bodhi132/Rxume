@@ -34,7 +34,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://rxume.vercel.app"
+    "https://rxume-7eyw.vercel.app"
 ]
 
 app.add_middleware(
