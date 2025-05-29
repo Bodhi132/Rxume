@@ -416,12 +416,13 @@ async def resume_tailor(job_url: str, file: UploadFile = File(...)):
     
     return {"tailored_resume": tailored_resume}
 
-@app.post("/upload-resume",response_model=dict)
+@app.post("/upload-resume", response_model=dict)
 async def create_pdf_document(
     user_id: str,
     json_data: dict,
     db: Session = Depends(get_db),
 ):
+    print("parsing resume")
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
