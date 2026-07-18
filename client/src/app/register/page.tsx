@@ -1,37 +1,9 @@
 "use client"
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axiosInstance from '../lib/axiosInstance';
-import Cookies from 'js-cookie';
+import React from 'react';
+import { SignUp } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 
 const Page = () => {
-  const [userDetails, setuserDetails] = useState({ email: "", password: "" });
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setuserDetails({ ...userDetails, [name]: value });
-  };
-
-  const handleEmailSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await axiosInstance.post('/register', userDetails, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      Cookies.set('access_token', response.data.access_token, { expires: 1, secure: true });
-      Cookies.set('user_id', response.data.user_id, { expires: 1, secure: true });
-      router.push('https://rxume.vercel.app/resumeBuilder');
-    } catch (error) {
-      console.error("Error during signup:", error);
-    }
-  };
-
-  const handleGoogleSignup = () => {
-    window.location.href = 'https://rxume.vercel.app/auth/login/google';
-  };
-
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
@@ -49,51 +21,54 @@ const Page = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
           >
-            <form onSubmit={handleEmailSignup} style={styles.form}>
-              <div style={styles.inputGroup}>
-                <label htmlFor="email" style={styles.label}>Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="your.hero@email.com"
-                  required
-                  style={styles.input}
-                  onChange={handleChange}
-                />
-              </div>
-              <div style={styles.inputGroup}>
-                <label htmlFor="password" style={styles.label}>Password:</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="••••••••"
-                  required
-                  style={styles.input}
-                  onChange={handleChange}
-                />
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05, rotate: [-1, 1, -1] }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                type="submit"
-                style={styles.button}
-              >
-                BOOM! Sign Up
-              </motion.button>
-            </form>
-            <div style={styles.divider}>🦹 OR 🦸‍♂️</div>
-            <motion.button
-              whileHover={{ scale: 1.05, rotate: [1, -1, 1] }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              onClick={handleGoogleSignup}
-              style={styles.oauthButton}
-            >
-              Sign Up with Google
-            </motion.button>
+            <div style={{ width: '100%' }}>
+              <SignUp 
+                routing="hash"
+                signInUrl="/login"
+                fallbackRedirectUrl="/resumeBuilder"
+                signInFallbackRedirectUrl="/resumeBuilder"
+                forceRedirectUrl="/resumeBuilder"
+                appearance={{
+                  elements: {
+                    rootBox: {
+                      width: '100%',
+                    },
+                    cardBox: {
+                      width: '100%',
+                      boxShadow: 'none',
+                    },
+                    card: {
+                      boxShadow: 'none',
+                      border: 'none',
+                      width: '100%',
+                      maxWidth: '100%',
+                      padding: '20px',
+                    },
+                    formButtonPrimary: {
+                      backgroundColor: "#ffec3d",
+                      color: "#000",
+                      border: "3px solid #000",
+                      boxShadow: "4px 4px 0 #000",
+                      borderRadius: "5px",
+                      textTransform: "uppercase",
+                      fontFamily: "'Bangers', cursive",
+                      fontSize: "18px",
+                      "&:hover": {
+                        backgroundColor: "#ffe000",
+                      }
+                    },
+                    socialButtonsBlockButton: {
+                      border: "3px solid #000",
+                      boxShadow: "2px 2px 0 #000",
+                      borderRadius: "5px",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5",
+                      }
+                    }
+                  }
+                }}
+              />
+            </div>
           </motion.div>
         </motion.div>
       </div>
@@ -123,11 +98,11 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   speechBubble: {
     background: '#fff',
-    padding: '30px',
     borderRadius: '15px',
     border: '5px solid #000',
     position: 'relative',
     boxShadow: '6px 6px 0 #000',
+    overflow: 'hidden',
   },
   form: {
     display: 'flex',

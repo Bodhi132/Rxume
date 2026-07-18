@@ -26,16 +26,17 @@ const styles = StyleSheet.create({
 // PDF Document Component
 const PdfViewer = (props: any) => {
     const formData = props?.formData;
-    const hasEmptyTechSkills = Object?.values(formData.technicalSkills)?.some(arr => Array.isArray(arr) && arr.length === 0);
-    const hasEmptyExperience = Object?.values(formData.experience)?.some(arr => Array.isArray(arr) && arr.length === 0);
-    const hasEmptyEducation = Object?.values(formData.education)?.some(arr => Array.isArray(arr) && arr.length === 0);
-    const hasEmptyProjects = Object?.values(formData.projects)?.some(arr => Array.isArray(arr) && arr.length === 0);
+    const isTechSkillsEmpty = !formData?.technicalSkills || Object.values(formData.technicalSkills).every((arr: any) => !arr || (Array.isArray(arr) && (arr.length === 0 || arr.every(s => typeof s !== 'string' || s.trim() === ''))));
+    const isExperienceEmpty = !formData?.experience || formData.experience.length === 0 || formData.experience.every((exp: any) => !exp.role && !exp.company);
+    const isEducationEmpty = !formData?.education || formData.education.length === 0 || formData.education.every((edu: any) => !edu.college && !edu.degree);
+    const isProjectsEmpty = !formData?.projects || formData.projects.length === 0 || formData.projects.every((proj: any) => !proj.name);
 
     return (
-        <PDFViewer width="100%" height="100%">
+        <PDFViewer key={JSON.stringify(formData)} width="100%" height="100%">
             <Document>
                 <Page size="A4" style={{ flexDirection: "column", paddingHorizontal: '20px', paddingVertical: '8px' }}>
-                    {formData?.userInfo.name &&
+                    <View></View>
+                    {formData?.userInfo?.name ? (
                         <View>
                             <View style={{ flexDirection: "row", justifyContent: "center", gap: 10 }}>
                                 <Text style={{ fontSize: '20px', fontWeight: 'bold', }}>{formData.userInfo.name}</Text>
@@ -64,46 +65,46 @@ const PdfViewer = (props: any) => {
                                 </Link>
                             </View>
                         </View>
-                    }
+                    ) : null}
 
-                    {!hasEmptyTechSkills &&
+                    {!isTechSkillsEmpty ? (
                         <View style={{ marginTop: '2px', paddingBottom: '5px', paddingTop: '2px', flexDirection: 'column', gap: '5px', fontSize: '11px' }}>
                             <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginVertical: '5px', marginLeft: '15px', marginBottom: '4px' }}>
                                 TECHNICAL SKILLS :
                             </Text>
                             <View style={{ marginLeft: '35px', flexDirection: 'column', gap: '4px', }}>
-                                {formData.technicalSkills.frontend?.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                {formData.technicalSkills.frontend?.length > 0 ? <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>Frontend -</Text>
                                     <Text>{formData?.technicalSkills?.frontend.join(", ")}</Text>
-                                </View>}
-                                {formData.technicalSkills.backend.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                </View> : null}
+                                {formData.technicalSkills.backend.length > 0 ? <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>Backend -</Text>
                                     <Text>{formData?.technicalSkills?.backend.join(", ")}</Text>
-                                </View>}
-                                {formData.technicalSkills.databases.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                </View> : null}
+                                {formData.technicalSkills.databases.length > 0 ? <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>Databases -</Text>
                                     <Text>{formData?.technicalSkills?.databases.join(", ")}</Text>
-                                </View>}
-                                {formData.technicalSkills.devops.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                </View> : null}
+                                {formData.technicalSkills.devops.length > 0 ? <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>Devops -</Text>
                                     <Text>{formData?.technicalSkills?.devops.join(", ")}</Text>
-                                </View>}
-                                {formData.technicalSkills.testing.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                </View> : null}
+                                {formData.technicalSkills.testing.length > 0 ? <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>Testing -</Text>
                                     <Text>{formData?.technicalSkills?.testing.join(", ")}</Text>
-                                </View>}
-                                {formData.technicalSkills.testing.length > 0 && <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
+                                </View> : null}
+                                {formData.technicalSkills.tools?.length > 0 ? <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '11px' }}>
                                         Tools -
                                     </Text>
                                     <Text>
                                         {formData?.technicalSkills?.tools?.join(", ")}
                                     </Text>
-                                </View>
+                                </View> : null
                                 }
                             </View>
-                        </View>}
-                    {!hasEmptyExperience &&
+                        </View>) : null}
+                    {!isExperienceEmpty ? (
                         <View >
                             <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '10px', marginLeft: '15px', marginBottom: '4px' }}>EXPERIENCE :</Text>
                             {
@@ -127,33 +128,33 @@ const PdfViewer = (props: any) => {
                                         <View style={{ display: 'flex', flexDirection: 'row', gap: '1px', flexWrap: 'wrap', marginTop: '4px' }}>
                                             <Text style={{ fontSize: '10px' }}>{'('}</Text>
                                             {
-                                                experience?.skill?.length > 0 && experience?.skill?.map((tech: string, index: number) => (
+                                                experience?.skill?.length > 0 ? experience?.skill?.map((tech: string, index: number) => (
                                                     <View key={index}>
                                                         <Text key={index} style={{ fontSize: '10px' }}>{tech}</Text>
                                                         <Text style={{ fontSize: '10px' }}>{index === experience.skill?.length - 1 ? "" : ","}</Text>
                                                     </View>
-                                                ))
+                                                )) : null
                                             }
                                             <Text style={{ fontSize: '11px' }}>{')'}</Text>
                                         </View>
                                         <View style={{ marginVertical: '7px', fontWeight: 'medium' }}>
                                             {
-                                                experience.description.length > 0 && experience?.description?.map((description: string, index: number) => {
-                                                    return (description !== "" &&
+                                                experience?.description?.length > 0 ? experience?.description?.map((description: string, index: number) => {
+                                                    return description !== "" ? (
                                                         <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
                                                             <Text style={{ fontWeight: 'bold', fontSize: '11px' }}>{'\u2022'}</Text>
                                                             <Text key={index}>{description}</Text>
-                                                        </View>)
+                                                        </View>) : null
                                                 }
-                                                )
+                                                ) : null
                                             }
                                         </View>
                                     </View>
                                 ))
                             }
                         </View>
-                    }
-                    {!hasEmptyEducation && <View>
+                    ) : null}
+                    {!isEducationEmpty ? (<View>
                         <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '5px', marginLeft: '15px', marginBottom: '6px' }}>EDUCATION :</Text>
                         {
                             formData?.education?.map((education: any, index: number) => (
@@ -162,14 +163,14 @@ const PdfViewer = (props: any) => {
                                         <Text>{education?.college || ""}</Text>
                                         <Text>|</Text>
                                         <Text>{education?.degree || ""}</Text>
-                                        {education?.grade > 0 &&
+                                        {education?.grade > 0 ? (
                                             <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                                 <Text>{'('}</Text>
                                                 <Text>{education?.grade || ""}</Text>
                                                 <Text>{education?.gradeType || ""}</Text>
                                                 <Text>{')'}</Text>
                                             </View>
-                                        }
+                                        ) : null}
                                     </View>
                                     <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '10px' }}>
                                         <Text>{education?.start ? new Date(education.start).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : ""}</Text>
@@ -178,8 +179,8 @@ const PdfViewer = (props: any) => {
                                 </View>
                             ))
                         }
-                    </View>}
-                    {!hasEmptyProjects && 
+                    </View>) : null}
+                    {!isProjectsEmpty ? (
                     <View>
                         <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '10px', marginLeft: '15px', marginBottom: '10px' }}>PROJECTS :</Text>
                         {
@@ -188,44 +189,51 @@ const PdfViewer = (props: any) => {
                                     <View style={{ marginBottom: '10px', marginLeft: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '12px', width: '50%' }}>
                                             <Text style={{ fontWeight: 'semibold', fontSize: '12px' }}>{project?.name || ""}</Text>
-                                            {project.codeLink && <Link src={project?.codeLink || ""}>
+                                            {project.codeLink ? <Link src={project?.codeLink || ""}>
                                                 <Text>Code</Text>
-                                            </Link>}
-                                            {project.demoLink && <Link src={project?.demoLink || ""}>
+                                            </Link> : null}
+                                            {project.demoLink ? <Link src={project?.demoLink || ""}>
                                                 <Text>Demo</Text>
-                                            </Link>}
+                                            </Link> : null}
                                         </View>
                                         <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '10px' }}>
                                             {/* <Text>{project?.description || ""}</Text> */}
                                             <View style={{ display: 'flex', flexDirection: 'row', gap: '2px', flexWrap: 'wrap' }}>
                                                 {
-                                                    project?.techStack?.length > 0 && project?.techStack?.map((tech: string, index: number) => (
+                                                    project?.techStack?.length > 0 ? project?.techStack?.map((tech: string, index: number) => (
                                                         <View key={index}>
                                                             <Text key={index}>{tech}</Text>
                                                             <Text>{index === project.techStack.length - 1 ? "" : ","}</Text>
                                                         </View>
-                                                    ))
+                                                    )) : null
                                                 }
                                             </View>
                                         </View>
                                     </View>
                                     <View>
                                         {
-                                            project?.description.map((description: string, index: number) => {
-                                                return description !== null && (
-                                                    <View style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '10px', marginVertical: '1px', paddingHorizontal: '15px' }} key={index}>
+                                            Array.isArray(project?.description) 
+                                                ? project.description.map((description: string, index: number) => {
+                                                    return description !== null && description.trim() !== "" ? (
+                                                        <View style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '10px', marginVertical: '1px', paddingHorizontal: '15px' }} key={index}>
+                                                            <Text style={{ fontWeight: 'bold', fontSize: '12px' }}>{'\u2022'}</Text>
+                                                            <Text>{description}</Text>
+                                                        </View>
+                                                    ) : null
+                                                })
+                                                : project?.description && typeof project.description === 'string' ? (
+                                                    <View style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '10px', marginVertical: '1px', paddingHorizontal: '15px' }}>
                                                         <Text style={{ fontWeight: 'bold', fontSize: '12px' }}>{'\u2022'}</Text>
-                                                        <Text>{description}</Text>
+                                                        <Text>{project.description}</Text>
                                                     </View>
-                                                )
-                                            })
+                                                ) : null
                                         }
                                     </View>
                                 </View>
                             ))
                         }
                     </View>
-                    }
+                    ) : null}
                 </Page>
             </Document>
         </PDFViewer>

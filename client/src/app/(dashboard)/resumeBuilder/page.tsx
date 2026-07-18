@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, SubmitHandler, useFieldArray, Controller, useWatch, set } from 'react-hook-form';
 import useFormPersist from "react-hook-form-persist";
+import { useRouter } from 'next/navigation';
 import { technicalSkills } from '@/data/skills';
 import DatePicker from "react-datepicker";
 // import PdfViewer from '@/app/components/PdfViewer';
@@ -21,9 +22,11 @@ const PdfViewer = dynamic(() => import('@/app/components/PdfViewer'), { ssr: fal
 const OptimisedPdf = dynamic(() => import('@/app/components/OptimizedResume'), { ssr: false });
 
 const App: React.FC = () => {
+  const router = useRouter();
 
   const [isClicked, setIsClicked] = useState(false)
   const [optmization, setOptmization] = useState(false)
+  const [optimizeKey, setOptimizeKey] = useState(0)
   const [localFormData, setlocalFormData] = useState('')
 
   useEffect(() => {
@@ -294,7 +297,7 @@ const App: React.FC = () => {
 
 
   const handleOptimize = () => {
-    setOptmization(true)
+    router.push('/optimized-resume');
   }
 
   const skills = Object.values(technicalSkills).flat();
@@ -798,10 +801,6 @@ const App: React.FC = () => {
       <div className='w-full px-4 flex justify-center my-3'>
         <button className='bg-[#EFF3EA] border-black w-4/6 p-4 block rounded-md personal-info-input font-semibold' onClick={handleOptimize}> OPTIMIZE </button>
       </div>
-      {optmization &&
-        <div className=' w-full h-[100vh] '>
-          <OptimisedPdf />
-        </div>}
     </div>
   );
 };

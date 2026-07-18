@@ -39,15 +39,12 @@ const OptimizedResume = () => {
         }[];
     }
 
-    const [formData, setFormData] = useState<FormData>({})
+    const [formData, setFormData] = useState<FormData>(localData)
 
-    useEffect(() => {
-        setFormData(localData)
-    }, [])
-
+    // Remove the redundant useEffect that sets formData on mount
     // useEffect(() => {
     //     setFormData(localData)
-    // }, [localData])
+    // }, [])
 
 
     const experience = formData.experience
@@ -63,6 +60,7 @@ const OptimizedResume = () => {
             setIsLoading(false)
             return
         }
+        setIsLoading(true);
         try {
             const expResponses = await Promise.all(experience.map(async (exp: any) => {
                 const expData = { texts: exp.description };
@@ -100,14 +98,26 @@ const OptimizedResume = () => {
             console.log('Optimized Data:', expDesc, projectDesc)
     }, [expDesc, projectDesc])
 
+    const isTechSkillsEmpty = !formData?.technicalSkills || Object.values(formData.technicalSkills).every((arr: any) => !arr || (Array.isArray(arr) && (arr.length === 0 || arr.every(s => typeof s !== 'string' || s.trim() === ''))));
+    const isExperienceEmpty = !formData?.experience || formData.experience.length === 0 || formData.experience.every((exp: any) => !exp.role && !exp.company);
+    const isEducationEmpty = !formData?.education || formData.education.length === 0 || formData.education.every((edu: any) => !edu.college && !edu.degree);
+    const isProjectsEmpty = !formData?.projects || formData.projects.length === 0 || formData.projects.every((proj: any) => !proj.name);
+
 
     return (
         <div className=' w-full h-full'>
-            {isLoading ? <p className='w-[90vw] h-[90vh] text-2xl'>'loading...'</p> :
-                <PDFViewer width="100%" height="100%">
+            {isLoading ? (
+                <div className="w-full h-[100vh] flex flex-col items-center justify-center text-white">
+                    <video src="/loading.webm" autoPlay loop muted className="w-64 h-64 mb-4 rounded-lg object-cover" />
+                    <h2 className="text-3xl font-bold font-['Bangers'] tracking-wider mb-2">Optimizing your resume with AI...</h2>
+                    <p className="text-xl">Please wait while we craft the perfect descriptions for you.</p>
+                </div>
+            ) :
+                <PDFViewer key={JSON.stringify(formData)} width="100%" height="100%">
                     <Document>
                         <Page size="A4" style={{ flexDirection: "column", paddingHorizontal: '20px', paddingVertical: '8px' }}>
-                            {formData?.userInfo?.name &&
+                            <View></View>
+                            {formData?.userInfo?.name ? (
                                 <View>
                                     <View style={{ flexDirection: "row", justifyContent: "center", gap: 10 }}>
                                         <Text style={{ fontSize: '20px', fontWeight: 'bold', }}>{formData.userInfo.name}</Text>
@@ -136,9 +146,9 @@ const OptimizedResume = () => {
                                         </Link>
                                     </View>
                                 </View>
-                            }
+                            ) : null}
 
-                            {formData?.technicalSkills &&
+                            {!isTechSkillsEmpty ? (
                                 <View style={{ marginTop: '2px', paddingBottom: '5px', paddingTop: '2px', flexDirection: 'column', gap: '5px', fontSize: '11px' }}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginVertical: '5px', marginLeft: '15px', marginBottom: '4px' }}>
                                         TECHNICAL SKILLS :
@@ -173,13 +183,13 @@ const OptimizedResume = () => {
                                             </Text>
                                         </View>
                                     </View>
-                                </View>}
+                                </View>) : null}
                             {
-                                experience &&
+                                !isExperienceEmpty ? (
                                 <View >
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '10px', marginLeft: '15px', marginBottom: '4px' }}>EXPERIENCE :</Text>
                                     {
-                                        experience && experience.map((experience: any, index: number) => (
+                                        experience ? experience.map((experience: any, index: number) => (
                                             <View key={index} style={{ marginBottom: '4px', marginLeft: '15px', fontWeight: 'semibold' }}>
                                                 <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '11px' }}>
                                                     <Text>{experience?.role || ""}</Text>
@@ -199,45 +209,43 @@ const OptimizedResume = () => {
                                                 <View style={{ display: 'flex', flexDirection: 'row', gap: '1px', flexWrap: 'wrap', marginTop: '4px' }}>
                                                     <Text style={{ fontSize: '10px' }}>{'('}</Text>
                                                     {
-                                                        experience?.skill?.length > 0 && experience?.skill?.map((tech: string, index: number) => (
+                                                        experience?.skill?.length > 0 ? experience?.skill?.map((tech: string, index: number) => (
                                                             <View key={index}>
                                                                 <Text key={index} style={{ fontSize: '10px' }}>{tech}</Text>
                                                                 <Text style={{ fontSize: '10px' }}>{index === experience.skill?.length - 1 ? "" : ","}</Text>
                                                             </View>
-                                                        ))
+                                                        )) : null
                                                     }
                                                     <Text style={{ fontSize: '11px' }}>{')'}</Text>
                                                 </View>
                                                 <View style={{ marginVertical: '7px', fontWeight: 'medium' }}>
                                                     {
-                                                        expDesc[index]?.length > 0 && expDesc[index]?.map((description: string, index: number) => {
-                                                            if (description !== "") {
-                                                                return description.charAt(0) === '-' ? (
-                                                                    description.split('-').filter((item: string) => item.trim() !== "").map((item: string, index: number) =>
-                                                                    (
-                                                                        <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
+                                                        expDesc[index] ? (
+                                                            (typeof expDesc[index] === 'string' 
+                                                                ? expDesc[index].split('\n')
+                                                                : Array.isArray(expDesc[index]) ? expDesc[index] : []
+                                                            ).map((description: string, dIndex: number) => {
+                                                                if (description && description.trim() !== "") {
+                                                                    const text = description.trim().replace(/^[-•]\s*/, '');
+                                                                    return (
+                                                                        <View key={dIndex} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
                                                                             <Text style={{ fontWeight: 'bold', fontSize: '11px' }}>{'\u2022'}</Text>
-                                                                            <Text key={index}>{item.trim()}</Text>
+                                                                            <Text>{text}</Text>
                                                                         </View>
-                                                                    )
-                                                                    )
-                                                                ) : (
-                                                                    <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
-                                                                        <Text style={{ fontWeight: 'bold', fontSize: '11px' }}>{'\u2022'}</Text>
-                                                                        <Text key={index}>{description}</Text>
-                                                                    </View>
-                                                                );
-                                                            }
-                                                            return null;
-                                                        })
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            })
+                                                        ) : null
                                                     }
                                                 </View>
                                             </View>
-                                        ))
+                                        )) : null
                                     }
                                 </View>
+                                ) : null
                             }
-                            {formData.education && <View>
+                            {!isEducationEmpty ? (<View>
                                 <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '5px', marginLeft: '15px', marginBottom: '6px' }}>EDUCATION :</Text>
                                 {
                                     formData?.education?.map((education: any, index: number) => (
@@ -246,14 +254,14 @@ const OptimizedResume = () => {
                                                 <Text>{education?.college || ""}</Text>
                                                 <Text>|</Text>
                                                 <Text>{education?.degree || ""}</Text>
-                                                {education?.grade > 0 &&
+                                                {education?.grade > 0 ? (
                                                     <View style={{ display: 'flex', flexDirection: 'row', gap: '5px' }}>
                                                         <Text>{'('}</Text>
                                                         <Text>{education?.grade || ""}</Text>
                                                         <Text>{education?.gradeType || ""}</Text>
                                                         <Text>{')'}</Text>
                                                     </View>
-                                                }
+                                                ) : null}
                                             </View>
                                             <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '10px' }}>
                                                 <Text>{education?.start ? new Date(education.start).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : ""}</Text>
@@ -262,66 +270,64 @@ const OptimizedResume = () => {
                                         </View>
                                     ))
                                 }
-                            </View>}
+                            </View>) : null}
                             {
-                                projects &&
+                                !isProjectsEmpty ? (
                                 <View>
                                     <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: '13px', marginTop: '10px', marginLeft: '15px', marginBottom: '10px' }}>PROJECTS :</Text>
                                     {
-                                        projects?.map((project: any, index: number) => (
+                                        projects ? projects.map((project: any, index: number) => (
                                             <View key={index} style={{ marginBottom: '7px' }}>
                                                 <View style={{ marginBottom: '10px', marginLeft: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                                     <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '12px', width: '50%' }}>
                                                         <Text style={{ fontWeight: 'semibold', fontSize: '12px' }}>{project?.name || ""}</Text>
-                                                        {project.codeLink && <Link src={project?.codeLink || ""}>
+                                                        {project.codeLink ? <Link src={project?.codeLink || ""}>
                                                             <Text>Code</Text>
-                                                        </Link>}
-                                                        {project.demoLink && <Link src={project?.demoLink || ""}>
+                                                        </Link> : null}
+                                                        {project.demoLink ? <Link src={project?.demoLink || ""}>
                                                             <Text>Demo</Text>
-                                                        </Link>}
+                                                        </Link> : null}
                                                     </View>
                                                     <View style={{ display: 'flex', flexDirection: 'row', gap: '5px', fontSize: '10px' }}>
                                                         {/* <Text>{project?.description || ""}</Text> */}
                                                         <View style={{ display: 'flex', flexDirection: 'row', gap: '2px', flexWrap: 'wrap' }}>
                                                             {
-                                                                project?.techStack?.length > 0 && project?.techStack?.map((tech: string, index: number) => (
+                                                                project?.techStack?.length > 0 ? project?.techStack?.map((tech: string, index: number) => (
                                                                     <View key={index}>
                                                                         <Text key={index}>{tech}</Text>
                                                                         <Text>{index === project.techStack.length - 1 ? "" : ","}</Text>
                                                                     </View>
-                                                                ))
+                                                                )) : null
                                                             }
                                                         </View>
                                                     </View>
                                                 </View>
                                                 <View style={{ marginVertical: '7px', fontWeight: 'medium' }}>
                                                     {
-                                                        projectDesc[index]?.length > 0 && projectDesc[index]?.map((projDesc: string, index: number) => {
-                                                            if (projDesc !== "") {
-                                                                return projDesc.charAt(0) === '-' ? (
-                                                                    projDesc.split('-').filter((item: string) => item.trim() !== "").map((item: string, index: number) =>
-                                                                    (
-                                                                        <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
+                                                        projectDesc[index] ? (
+                                                            (typeof projectDesc[index] === 'string' 
+                                                                ? projectDesc[index].split('\n')
+                                                                : Array.isArray(projectDesc[index]) ? projectDesc[index] : []
+                                                            ).map((projDesc: string, dIndex: number) => {
+                                                                if (projDesc && projDesc.trim() !== "") {
+                                                                    const text = projDesc.trim().replace(/^[-•]\s*/, '');
+                                                                    return (
+                                                                        <View key={dIndex} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
                                                                             <Text style={{ fontWeight: 'bold', fontSize: '11px' }}>{'\u2022'}</Text>
-                                                                            <Text key={index}>{item.trim()}</Text>
+                                                                            <Text>{text}</Text>
                                                                         </View>
-                                                                    )
-                                                                    )
-                                                                ) : (
-                                                                    <View key={index} style={{ flexDirection: 'row', alignItems: "flex-start", gap: '10px', fontSize: '11px', marginVertical: '1px', paddingHorizontal: '15px' }}>
-                                                                        <Text style={{ fontWeight: 'bold', fontSize: '11px' }}>{'\u2022'}</Text>
-                                                                        <Text key={index}>{projDesc}</Text>
-                                                                    </View>
-                                                                );
-                                                            }
-                                                            return null;
-                                                        })
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            })
+                                                        ) : null
                                                     }
                                                 </View>
                                             </View>
-                                        ))
+                                        )) : null
                                     }
                                 </View>
+                                ) : null
                             }
                         </Page>
                     </Document>
