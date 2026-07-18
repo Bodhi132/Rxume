@@ -8,7 +8,6 @@ const Header = () => {
       <div className="flex items-center gap-4">
         {/* UserButton automatically provides a dropdown with a "Sign out" option */}
         <UserButton 
-          afterSignOutUrl="/"
           appearance={{
             elements: {
               avatarBox: "w-12 h-12 border-2 border-gray-200" // made avatar slightly bigger for taller header

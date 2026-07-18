@@ -27,6 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
+      afterSignOutUrl="/"
       localization={{
         ...enUS,
         unstable__errors: {
